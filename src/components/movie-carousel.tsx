@@ -9,10 +9,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useMoviesHome } from "@/hooks/useMoviesHome";
 import { MovieCard } from "@/components/movie-card";
 
 interface Movie {
-  id: string;
+  movieId: string;
   title: string;
   englishTitle?: string;
   posterUrl: string;
@@ -25,10 +26,18 @@ interface Movie {
 interface MovieCarouselProps {
   title: string;
   viewAllLink?: string;
-  movies: Movie[];
 }
 
-export function MovieCarousel({ title, viewAllLink, movies }: MovieCarouselProps) {
+export function MovieCarousel({ title, viewAllLink}: MovieCarouselProps) {
+  const { nowShowingMovies, comingSoonMovies, loading } = useMoviesHome();
+
+  let movies: Movie[] = [];
+
+  if(viewAllLink == "/dang-chieu") {
+    movies = nowShowingMovies;
+  } else if (viewAllLink == "/sap-chieu"){
+    movies = comingSoonMovies; 
+  }
   return (
     <div className="w-full py-6">
       <div className="mb-4 flex items-center justify-between">
@@ -53,11 +62,11 @@ export function MovieCarousel({ title, viewAllLink, movies }: MovieCarouselProps
         <CarouselContent className="-ml-4">
           {movies.map((movie) => (
             <CarouselItem
-              key={movie.id}
+              key={movie.movieId}
               className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
             >
               <MovieCard
-                id={movie.id}
+                id={movie.movieId}
                 title={movie.title}
                 englishTitle={movie.englishTitle}
                 posterUrl={movie.posterUrl}
