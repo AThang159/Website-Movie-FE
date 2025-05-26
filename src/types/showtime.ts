@@ -1,5 +1,6 @@
 export interface Showtime {
-  movieId: number;
+  id: string,
+  movieId: string;
   showDate: string; // ISO format: '2025-05-26'
   startTime: string; // e.g. '14:00:00'
   endTime: string;

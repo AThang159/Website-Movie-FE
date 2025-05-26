@@ -6,6 +6,8 @@ import { fetchCities} from "../lib/api/cities-api"
 import { fetchMovieFormats } from "@/lib/api/movie-formats-api"
 import { fetchTheaters } from "@/lib/api/theaters-api"
 import { fetchShowtimesByMovieAndDate } from "@/lib/api/showtimes-api"
+import Link from "next/link";
+
 
 interface MovieProps {
   movieId: string
@@ -192,10 +194,14 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
                     {item.showtimes
                       .sort((a: any, b: any) => (a.time ?? "").localeCompare(b.time ?? ""))
                       .map((showtime: any, idx: number) => (
-                        <div key={idx} className="border rounded p-2 text-center hover:border-red-500 cursor-pointer">
+                        <Link
+                          key={showtime.id}
+                          href={`/dat-ve/${showtime.id}`}
+                          className="border rounded p-2 text-center hover:border-red-500 cursor-pointer block"
+                        >
                           <div className="text-sm font-medium">{formatTime(showtime.startTime)}</div>
                           <div className="text-xs text-gray-500">{formatPrice(showtime.price)}</div>
-                        </div>
+                        </Link>
                       ))}
                   </div>
                 </div>
