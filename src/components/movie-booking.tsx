@@ -1,9 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { use, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Search, HelpCircle, User } from "lucide-react"
+import { Movie } from "@/types/movie"
+import { Showtime } from "@/types/showtime"
+import { getShowtime } from "@/lib/api/showtimes-api"
+import { getMovie } from "@/lib/api/movies-api"
+import { getSeatStatusesByShowtime } from "@/lib/api/seat-statuses-api"
+import { SeatStatus } from "@/types/seat-status"
+import { getRoomName } from "@/lib/api/rooms-api"
+import { getTheaterName } from "@/lib/api/theaters-api"
 
 interface MovieBookingProps {
   showtimeId: string;
@@ -11,44 +19,122 @@ interface MovieBookingProps {
 
 export default function MovieBooking({ showtimeId }: MovieBookingProps) {
 
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([])
+  const [showtime, setShowtime] = useState<Showtime>();
+  const [seatStatuses, setSeatStatuses] = useState<SeatStatus[]>([]);
+  const [unavailableSeats, setUnavailableSeats] = useState<number[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+  const [vipSeats, setVipSeats] = useState<number[]>([]);
+  const [movie, setMovie] = useState<Movie>();
+  const [roomName, setRoomName] = useState<string>();
+  const [theaterName, setTheaterName] = useState<string>();
 
-  const seatRows = ["A", "B", "C", "D", "E"]
-  const seatsPerRow = 16
+  useEffect(() =>{
+      const fetchShowtime = async () => {
+          try {
+              const response = await getShowtime(showtimeId);
+              console.log(response);
+              setShowtime(response);
+          } catch (error){
+              console.error("Failed to fetch showtime", error);
+              setShowtime(undefined);
+          }
+      }
+      fetchShowtime();
+  }, []);
 
-  // Mock data for seat availability
-  const unavailableSeats = ["A5", "A6", "B8", "B9", "C10", "D3", "D4", "E12"]
-  const vipSeats = [
-    "C5",
-    "C6",
-    "C7",
-    "C8",
-    "C9",
-    "C10",
-    "C11",
-    "C12",
-    "D5",
-    "D6",
-    "D7",
-    "D8",
-    "D9",
-    "D10",
-    "D11",
-    "D12",
-  ]
+  useEffect(() =>{
+      const fecthMovie = async () => {
+          try {
+            if (showtime?.movieId === "" || !showtime?.movieId) {
+              setMovie(undefined);
+              return;
+            }
+            const response = await getMovie(showtime?.movieId);
+            setMovie(response);
+          } catch (error){
+              console.error("Failed to fetch movie", error);
+              setMovie(undefined);
+          }
+      }
+      fecthMovie();
+  }, [showtime]);
 
-  const toggleSeat = (seatId: string) => {
-    if (unavailableSeats.includes(seatId)) return
+  useEffect(() =>{
+    const fecthRoomName = async () => {
+      if (showtime?.roomId === undefined) {
+        setRoomName(undefined);
+        return;
+      }
+      try {
+          const response = await getRoomName(showtime?.roomId);
+          setRoomName(response);
+      } catch (error){
+          console.error("Failed to fetch room name", error);
+          setRoomName(undefined);
+      }
+    }
+    fecthRoomName();
+  }, [showtime]);
 
-    setSelectedSeats((prev) => (prev.includes(seatId) ? prev.filter((id) => id !== seatId) : [...prev, seatId]))
+  useEffect(() =>{
+    const fecthTheaterName = async () => {
+      if (showtime?.theaterId === undefined) {
+        setTheaterName(undefined);
+        return;
+      }
+        try {
+            const response = await getTheaterName(showtime?.theaterId);
+            setTheaterName(response);
+        } catch (error){
+            console.error("Failed to fetch theater name", error);
+            setTheaterName(undefined);
+        }
+    }
+    fecthTheaterName();
+  }, [showtime]);
+
+  useEffect(() => {
+    if (!showtime) return
+
+    const fetchSeatStatuses = async () => {
+      try {
+        const seatStatuses = await getSeatStatusesByShowtime(showtime.id)
+        const vipSeats = seatStatuses
+        .filter((s) => s.seat.type === "VIP")
+        .map((s) => s.seat.id)
+        setVipSeats(vipSeats) 
+        const bookedSeats = seatStatuses
+          .filter((s) => s.bookingDetailId !== null)
+          .map((s) => s.seat.id)
+        setUnavailableSeats(bookedSeats)
+        setSeatStatuses(seatStatuses)
+      } catch (error) {
+        console.error("Failed to fetch seat statuses", error)
+        setUnavailableSeats([])
+      }
+    }
+    fetchSeatStatuses()
+  }, [showtime])
+
+  const toggleSelectSeat = (seatId: number) => {
+    setSelectedSeats(prev =>
+      prev.includes(seatId)
+        ? prev.filter(id => id !== seatId).sort((a, b) => a - b)
+        : [...prev, seatId].sort((a, b) => a - b)
+    )
   }
 
-  const getSeatStatus = (seatId: string) => {
+
+
+  const getSeatStatus = (seatId: number) => {
     if (selectedSeats.includes(seatId)) return "selected"
     if (unavailableSeats.includes(seatId)) return "unavailable"
     if (vipSeats.includes(seatId)) return "vip"
     return "available"
   }
+
+  const rows = Array.from(new Set(seatStatuses.map(seatStatus => seatStatus.seat.row))).sort();
+
 
   const getSeatColor = (status: string) => {
     switch (status) {
@@ -62,6 +148,10 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
         return "bg-gray-200 hover:bg-gray-300"
     }
   }
+
+  const formatVND = (amount: number) => {
+    return new Intl.NumberFormat("vi-VN").format(amount) + " đ";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -122,30 +212,36 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
 
                 {/* Seating Chart */}
                 <div className="space-y-3">
-                  {seatRows.map((row) => (
-                    <div key={row} className="flex items-center justify-center space-x-2">
-                      <div className="w-8 text-center font-medium text-gray-600">{row}</div>
-                      <div className="flex space-x-1">
-                        {Array.from({ length: seatsPerRow }, (_, i) => {
-                          const seatNumber = i + 1
-                          const seatId = `${row}${seatNumber}`
-                          const status = getSeatStatus(seatId)
+                  {rows.map((row) => {
+                    // Lọc ghế trong hàng row và sắp xếp theo column
+                    const seatStatusesInRow = seatStatuses
+                      .filter(seatStatus => seatStatus.seat.row === row)
+                      .sort((a, b) => a.seat.columnIndex - b.seat.columnIndex);
 
-                          return (
-                            <button
-                              key={seatId}
-                              onClick={() => toggleSeat(seatId)}
-                              className={`w-6 h-6 rounded text-xs font-medium transition-colors ${getSeatColor(status)}`}
-                              disabled={status === "unavailable"}
-                            >
-                              {seatNumber}
-                            </button>
-                          )
-                        })}
+                    return (
+                      <div key={row} className="flex items-center justify-center space-x-2">
+                        <div className="w-8 text-center font-medium text-gray-600">{row}</div>
+                        <div className="flex space-x-1">
+                          {seatStatusesInRow.map(seatStatuses => {
+                            const status = getSeatStatus(seatStatuses.id);
+
+                            return (
+                              <button
+                                key={seatStatuses.seat.seatCode}
+                                onClick={() => toggleSelectSeat(seatStatuses.id)}
+                                className={`w-6 h-6 rounded text-xs font-medium transition-colors ${getSeatColor(status)}`}
+                                disabled={status === "unavailable"}
+                              >
+                                {seatStatuses.seat.columnIndex}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
+
 
                 {/* Seat Types */}
                 <div className="flex items-center justify-center space-x-8 mt-8">
@@ -166,13 +262,28 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
           <div className="space-y-6">
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-4">Doraemon Movie 44: Nobita Và Cuộc Phiêu Lưu Ở Vùng Đất Mới</h3>
+                <h3 className="font-bold text-lg mb-4">{movie?.title}</h3>
                 <div className="space-y-2 text-sm text-gray-600">
                   <div>
-                    Suất <span className="font-medium">15:00 26/05/2025</span>
+                    Rạp <span className="font-medium">{theaterName}</span>
                   </div>
                   <div>
-                    Phòng chiếu <span className="font-medium">P2 - Ghế ...</span>
+                    Suất <span className="font-medium">{showtime?.startTime}</span>
+                  </div>
+                  <div>
+                    Ngày <span className="font-medium">{showtime?.showDate}</span>
+                  </div>
+                  <div>
+                    Phòng chiếu <span className="font-medium">{roomName}</span>
+                  </div>
+                  <div>
+                    Ghế{" "}
+                    <span className="font-medium">
+                      {selectedSeats
+                        .map(id => seatStatuses.find(seat => seat.id === id)?.seat.seatCode)
+                        .filter(Boolean)
+                        .join(", ") || "..."}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -182,7 +293,9 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
               <CardContent className="p-6">
                 <div className="text-center">
                   <div className="text-sm text-gray-600 mb-2">TỔNG ĐƠN HÀNG</div>
-                  <div className="text-3xl font-bold">0 đ</div>
+                  <div className="text-3xl font-bold">
+                    {formatVND(selectedSeats.length * (showtime?.price ?? 0))}
+                  </div>
                 </div>
               </CardContent>
             </Card>

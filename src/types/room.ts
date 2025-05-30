@@ -1,6 +1,6 @@
 import { Seat } from './seat';
 
-export interface TheaterRoom {
+export interface Room {
   id: string
   name: string
   address: string

@@ -11,3 +11,9 @@ export async function getComingSoonMovies(): Promise<Movie[]> {
   if (!res.ok) throw new Error("Failed to fetch coming-soon movies");
   return res.json();
 }
+
+export async function getMovie(movieId: string): Promise<Movie> {
+  const res = await fetch(`http://localhost:8080/api/movies/${movieId}`);
+  if (!res.ok) throw new Error("Failed to fetch movie");
+  return res.json();
+}

@@ -1,4 +1,7 @@
 export interface Seat{
     id: number;
-    name: string;
+    row: string;
+    columnIndex: number;
+    seatCode: string;
+    type: string;
 }

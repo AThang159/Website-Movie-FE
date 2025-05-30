@@ -1,9 +1,9 @@
-import { TheaterChain } from "./theater-chain";
+import { Chain } from "./chain";
 
 export interface Theater {
   id: string
   name: string
   address: string
-  theaterChain: TheaterChain;
+  chain: Chain;
   cityName: string;
 }

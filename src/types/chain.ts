@@ -1,4 +1,4 @@
-export interface TheaterChain {
+export interface Chain {
   id: number;
   name: string;
   logo?: string;

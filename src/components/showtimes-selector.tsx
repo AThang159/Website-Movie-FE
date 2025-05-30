@@ -181,7 +181,7 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
                 <div className="bg-gray-50 p-4 border-b">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                      <span className="font-bold text-red-600">{item.theater.theaterChain.name.charAt(0)}</span>
+                      <span className="font-bold text-red-600">{item.theater.chain.name.charAt(0)}</span>
                     </div>
                     <div>
                       <h3 className="font-medium">{item.theater.name}</h3>
