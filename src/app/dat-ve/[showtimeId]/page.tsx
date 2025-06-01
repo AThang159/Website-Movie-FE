@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import MovieBooking from "@/components/movie-booking"
 
 interface PageProps {
@@ -6,7 +8,7 @@ interface PageProps {
   }
 }
 
-export default function Page({ params }: PageProps) {
-  const { showtimeId } = params;
+export default async function Page({ params }: PageProps) {
+  const showtimeId = params.showtimeId;
   return <MovieBooking showtimeId={showtimeId} />
 }

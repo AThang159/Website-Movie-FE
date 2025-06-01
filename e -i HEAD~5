@@ -1,0 +1,23 @@
+[33mcommit 518fb1fac4c385155df3a312cc05340f2f2cbcb3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: thang <truonghaithang@gmail.com>
+Date:   Fri May 30 09:10:30 2025 +0700
+
+    feat: add UI seat select and booking
+
+[33mcommit 9659d21d2e0e9533b458f24f8872d6348c7baa4b[m
+Author: thang <truonghaithang@gmail.com>
+Date:   Mon May 26 21:21:24 2025 +0700
+
+    add UI movie-booking
+
+[33mcommit 942f7cd4e30eb506896798caf328aef5272aa09c[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: thang <truonghaithang@gmail.com>
+Date:   Mon May 26 18:04:22 2025 +0700
+
+    feat: add showtimes UI and fetch hook for movie details
+
+[33mcommit 411ad37eb6b0f2e219ecb01b3791cbe109d23ecb[m
+Author: AThang159 <truonghaithang@gmail.com>
+Date:   Sat May 3 12:51:53 2025 +0000
+
+    clone fronend  movie.com
