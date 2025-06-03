@@ -1,44 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Edit, Trash2, Mail, Phone, Calendar } from "lucide-react"
+import { fetchUsers } from "@/lib/api/users-api"
+import { User } from "@/types/user"
 
 export function UserManagement() {
-  const [users] = useState([
-    {
-      id: 1,
-      name: "Nguyễn Văn A",
-      email: "nguyenvana@email.com",
-      phone: "0123456789",
-      joinDate: "2024-01-15",
-      totalBookings: 12,
-      totalSpent: 1440000,
-      status: "Hoạt động",
-    },
-    {
-      id: 2,
-      name: "Trần Thị B",
-      email: "tranthib@email.com",
-      phone: "0987654321",
-      joinDate: "2024-02-20",
-      totalBookings: 8,
-      totalSpent: 960000,
-      status: "Hoạt động",
-    },
-    {
-      id: 3,
-      name: "Lê Văn C",
-      email: "levanc@email.com",
-      phone: "0555666777",
-      joinDate: "2024-03-10",
-      totalBookings: 3,
-      totalSpent: 360000,
-      status: "Tạm khóa",
-    },
-  ])
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+      fetchUsers()
+        .then((data) => setUsers(data))
+        .catch((err) => console.error("Error:", err))
+        .finally(() => setLoading(false))
+    }, [])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN").format(price)
@@ -79,7 +58,7 @@ export function UserManagement() {
                   <tr key={user.id} className="border-b hover:bg-gray-50">
                     <td className="p-3">
                       <div>
-                        <p className="font-medium">{user.name}</p>
+                        <p className="font-medium">{user.firstName} {user.lastName}</p>
                         <p className="text-sm text-gray-500">ID: {user.id}</p>
                       </div>
                     </td>
@@ -98,13 +77,13 @@ export function UserManagement() {
                     <td className="p-3">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1 text-gray-400" />
-                        {user.joinDate}
+                        {}
                       </div>
                     </td>
                     <td className="p-3 text-center">
-                      <span className="font-medium">{user.totalBookings}</span>
+                      <span className="font-medium">{}</span>
                     </td>
-                    <td className="p-3 font-medium">{formatPrice(user.totalSpent)} đ</td>
+                    <td className="p-3 font-medium">{formatPrice(0)} đ</td>
                     <td className="p-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${

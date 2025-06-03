@@ -17,3 +17,13 @@ export async function fetchTheatersByCityId(cityId: number): Promise<Theater[]> 
   if (!res.ok) throw new Error("Failed to fetch theater");
   return res.json();
 }
+
+export async function addTheater() {
+  const res = await fetch("http://localhost:8080/api/theaters", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(""),
+  })
+  if (!res.ok) throw new Error("Failed to add cinema")
+  return res.json()
+}

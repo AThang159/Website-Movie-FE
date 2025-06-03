@@ -1,53 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Eye, Download, Calendar, Clock } from "lucide-react"
+import { Booking } from "@/types/booking"
+import { fetchBookings } from "@/lib/api/booking-api"
 
 export function BookingManagement() {
-  const [bookings] = useState([
-    {
-      id: "BK001",
-      customerName: "Nguyễn Văn A",
-      movie: "Doraemon Movie 44",
-      cinema: "Beta Trần Quang Khải",
-      screen: "P4",
-      date: "2025-05-30",
-      time: "08:00",
-      seats: ["A1", "A2"],
-      totalAmount: 200000,
-      status: "Đã thanh toán",
-      bookingDate: "2025-05-28 14:30",
-    },
-    {
-      id: "BK002",
-      customerName: "Trần Thị B",
-      movie: "Spider-Man: No Way Home",
-      cinema: "CGV Vincom Center",
-      screen: "P1",
-      date: "2025-05-30",
-      time: "10:30",
-      seats: ["B5", "B6", "B7"],
-      totalAmount: 360000,
-      status: "Đã thanh toán",
-      bookingDate: "2025-05-29 09:15",
-    },
-    {
-      id: "BK003",
-      customerName: "Lê Văn C",
-      movie: "Avatar: The Way of Water",
-      cinema: "Lotte Cinema Diamond",
-      screen: "P2",
-      date: "2025-05-30",
-      time: "14:00",
-      seats: ["C10"],
-      totalAmount: 130000,
-      status: "Chờ thanh toán",
-      bookingDate: "2025-05-29 16:45",
-    },
-  ])
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+        fetchBookings()
+          .then((data) => setBookings(data))
+          .catch((err) => console.error("Error:", err))
+          .finally(() => setLoading(false))
+      }, [])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN").format(price)
@@ -124,9 +95,7 @@ export function BookingManagement() {
                   <th className="text-left p-3">Phim</th>
                   <th className="text-left p-3">Rạp & Phòng</th>
                   <th className="text-left p-3">Suất chiếu</th>
-                  <th className="text-left p-3">Ghế</th>
                   <th className="text-left p-3">Tổng tiền</th>
-                  <th className="text-left p-3">Trạng thái</th>
                   <th className="text-left p-3">Thao tác</th>
                 </tr>
               </thead>
@@ -135,51 +104,31 @@ export function BookingManagement() {
                   <tr key={booking.id} className="border-b hover:bg-gray-50">
                     <td className="p-3">
                       <div>
-                        <p className="font-medium">{booking.id}</p>
-                        <p className="text-xs text-gray-500">{booking.bookingDate}</p>
+                        <p className="font-medium">{booking.bookingCode}</p>
+                        <p className="text-xs text-gray-500">{booking.bookingTime}</p>
                       </div>
                     </td>
-                    <td className="p-3 font-medium">{booking.customerName}</td>
-                    <td className="p-3">{booking.movie}</td>
+                    <td className="p-3 font-medium">{booking.customerFullName}</td>
+                    <td className="p-3">{booking.showtime.movie.title}</td>
                     <td className="p-3">
                       <div>
-                        <p className="text-sm">{booking.cinema}</p>
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{booking.screen}</span>
+                        <p className="text-sm">{booking.showtime.theater?.name}</p>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{booking.showtime.room?.name}</span>
                       </div>
                     </td>
                     <td className="p-3">
                       <div className="text-sm">
                         <div className="flex items-center">
                           <Calendar className="w-3 h-3 mr-1 text-gray-400" />
-                          {booking.date}
+                          {booking.showtime.showDate} 
                         </div>
                         <div className="flex items-center">
                           <Clock className="w-3 h-3 mr-1 text-gray-400" />
-                          {booking.time}
+                          {booking.showtime.startTime}
                         </div>
                       </div>
                     </td>
-                    <td className="p-3">
-                      <div className="flex flex-wrap gap-1">
-                        {booking.seats.map((seat) => (
-                          <span key={seat} className="px-2 py-1 bg-gray-100 rounded text-xs">
-                            {seat}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="p-3 font-medium">{formatPrice(booking.totalAmount)} đ</td>
-                    <td className="p-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          booking.status === "Đã thanh toán"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
-                    </td>
+                    <td className="p-3 font-medium">{formatPrice(booking.totalPrice + booking.serviceFee)} đ</td>
                     <td className="p-3">
                       <Button size="sm" variant="outline">
                         <Eye className="w-4 h-4" />

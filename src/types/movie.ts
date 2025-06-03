@@ -13,5 +13,5 @@ export interface Movie {
   cast: string[];     
   trailerUrl?: string;
   featured?: boolean;
-  isComingSoon?: boolean;
+  status: string;
 }

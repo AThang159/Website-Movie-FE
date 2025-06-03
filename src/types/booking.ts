@@ -1,5 +1,6 @@
 import { User } from './user';
 import { Ticket } from './ticket'   
+import { Showtime } from './showtime';
 
 export interface Booking{
     id: string,
@@ -13,4 +14,5 @@ export interface Booking{
     serviceFee: number,
     amount: number,
     paymentMethod: string,
+    showtime: Showtime
 }

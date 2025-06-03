@@ -1,49 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, Edit, Trash2, Search, Calendar, Clock } from "lucide-react"
+import { Showtime } from "@/types/showtime"
+import { fetchShowtime, fetchShowtimes } from "@/lib/api/showtimes-api"
 
 export function ShowtimeManagement() {
   const [showAddForm, setShowAddForm] = useState(false)
-  const [showtimes] = useState([
-    {
-      id: 1,
-      movie: "Doraemon Movie 44",
-      cinema: "Beta Trần Quang Khải",
-      screen: "P4",
-      date: "2025-05-30",
-      time: "08:00",
-      price: 95000,
-      availableSeats: 75,
-      totalSeats: 120,
-    },
-    {
-      id: 2,
-      movie: "Spider-Man: No Way Home",
-      cinema: "CGV Vincom Center",
-      screen: "P1",
-      date: "2025-05-30",
-      time: "10:30",
-      price: 120000,
-      availableSeats: 61,
-      totalSeats: 150,
-    },
-    {
-      id: 3,
-      movie: "Avatar: The Way of Water",
-      cinema: "Lotte Cinema Diamond",
-      screen: "P2",
-      date: "2025-05-30",
-      time: "14:00",
-      price: 130000,
-      availableSeats: 60,
-      totalSeats: 180,
-    },
-  ])
+  const [showtimes, setShowtimes] = useState<Showtime[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+      fetchShowtimes()
+        .then((data) => setShowtimes(data))
+        .catch((err) => console.error("Error:", err))
+        .finally(() => setLoading(false))
+    }, [])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN").format(price)
@@ -155,32 +132,32 @@ export function ShowtimeManagement() {
               <tbody>
                 {showtimes.map((showtime) => (
                   <tr key={showtime.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3 font-medium">{showtime.movie}</td>
-                    <td className="p-3">{showtime.cinema}</td>
+                    <td className="p-3 font-medium">{showtime.movie.title}</td>
+                    <td className="p-3">{showtime.theater?.name}</td>
                     <td className="p-3">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{showtime.screen}</span>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{showtime.room?.name}</span>
                     </td>
                     <td className="p-3">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1 text-gray-400" />
-                        {showtime.date}
+                        {showtime.showDate}
                       </div>
                     </td>
                     <td className="p-3">
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-1 text-gray-400" />
-                        {showtime.time}
+                        {showtime.startTime}
                       </div>
                     </td>
                     <td className="p-3 font-medium">{formatPrice(showtime.price)} đ</td>
                     <td className="p-3">
                       <div className="text-center">
-                        <span className="font-medium">{showtime.availableSeats}</span>
-                        <span className="text-gray-500">/{showtime.totalSeats}</span>
+                        <span className="font-medium">{showtime.seatsAvailable}</span>
+                        <span className="text-gray-500">/{showtime.seatsTotal}</span>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                           <div
                             className="bg-green-500 h-2 rounded-full"
-                            style={{ width: `${(showtime.availableSeats / showtime.totalSeats) * 100}%` }}
+                            style={{ width: `${(showtime.seatsAvailable / showtime.seatsTotal) * 100}%` }}
                           ></div>
                         </div>
                       </div>

@@ -1,44 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Edit, Trash2, Search } from "lucide-react"
+import { fetchMovies } from "@/lib/api/movies-api"
+
+import { Movie } from "@/types/movie"
 
 export function MovieManagement() {
   const [showAddForm, setShowAddForm] = useState(false)
-  const [movies] = useState([
-    {
-      id: 1,
-      title: "Doraemon Movie 44: Nobita Và Cuộc Phiêu Lưu Ở Vùng Dales",
-      genre: "Hoạt hình",
-      duration: "110 phút",
-      rating: "P",
-      releaseDate: "2025-05-30",
-      status: "Đang chiếu",
-    },
-    {
-      id: 2,
-      title: "Spider-Man: No Way Home",
-      genre: "Hành động",
-      duration: "148 phút",
-      rating: "T13",
-      releaseDate: "2025-05-15",
-      status: "Đang chiếu",
-    },
-    {
-      id: 3,
-      title: "Avatar: The Way of Water",
-      genre: "Khoa học viễn tưởng",
-      duration: "192 phút",
-      rating: "T13",
-      releaseDate: "2025-06-01",
-      status: "Sắp chiếu",
-    },
-  ])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchMovies();
+        setMovies(response);
+        setLoading(false);
+      } catch (error) {
+        console.log("Failed fetch movies");
+        setLoading(true);
+        setMovies([])
+      }
+    }
+    fetchData()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -124,55 +116,68 @@ export function MovieManagement() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-3">Tên phim</th>
-                  <th className="text-left p-3">Thể loại</th>
-                  <th className="text-left p-3">Thời lượng</th>
-                  <th className="text-left p-3">Phân loại</th>
-                  <th className="text-left p-3">Ngày khởi chiếu</th>
-                  <th className="text-left p-3">Trạng thái</th>
-                  <th className="text-left p-3">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {movies.map((movie) => (
-                  <tr key={movie.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3 font-medium">{movie.title}</td>
-                    <td className="p-3">{movie.genre}</td>
-                    <td className="p-3">{movie.duration}</td>
-                    <td className="p-3">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{movie.rating}</span>
-                    </td>
-                    <td className="p-3">{movie.releaseDate}</td>
-                    <td className="p-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          movie.status === "Đang chiếu"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {movie.status}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
+          {loading ? (
+            <p>Đang tải dữ liệu phim...</p>
+          ) : error ? (
+            <p className="text-red-500">Lỗi: {error}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3">Tên phim</th>
+                    <th className="text-left p-3">Thể loại</th>
+                    <th className="text-left p-3">Thời lượng</th>
+                    <th className="text-left p-3">Đánh giá</th>
+                    <th className="text-left p-3">Ngày khởi chiếu</th>
+                    <th className="text-left p-3">Trạng thái</th>
+                    <th className="text-left p-3">Thao tác</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {movies.map((movie: Movie) => (
+                    <tr key={movie.id} className="border-b hover:bg-gray-50">
+                      <td className="p-3 font-medium">{movie.title}</td>
+                      <td className="p-3">{movie.genres.join(", ")}</td>
+                      <td className="p-3">{movie.duration} phút</td>
+                      <td className="p-3">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{movie.rating}</span>
+                      </td>
+                      <td className="p-3">{movie.releaseDate}</td>
+                      <td className="p-3">
+                        {(() => {
+                          const statusMap: Record<string, { text: string; color: string }> = {
+                            "Đang chiếu": { text: "Đang chiếu", color: "bg-green-100 text-green-800" },
+                            "Sắp chiếu": { text: "Sắp chiếu", color: "bg-yellow-100 text-yellow-800" },
+                            "Dừng chiếu": { text: "Dừng chiếu", color: "bg-red-100 text-red-800" },
+                          };
+
+                          const status = movie.status;
+                          const style = statusMap[status] || { text: status, color: "bg-gray-100 text-gray-800" };
+
+                          return (
+                            <span className={`px-2 py-1 rounded-full text-xs ${style.color}`}>
+                              {style.text}
+                            </span>
+                          );
+                        })()}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

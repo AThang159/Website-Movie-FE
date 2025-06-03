@@ -25,3 +25,27 @@ export async function fetchShowtime(id: string): Promise<ShowtimeDetail> {
 
   return res.json();
 }
+
+export async function fetchShowtimesToday(): Promise<Showtime[]> {
+  const url = `http://localhost:8080/api/showtimes/today`;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Failed to fetch showtimes today`);
+  }
+
+  return res.json();
+}
+
+export async function fetchShowtimes(): Promise<Showtime[]> {
+  const url = `http://localhost:8080/api/showtimes`;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Failed to fetch showtimes`);
+  }
+
+  return res.json();
+}
