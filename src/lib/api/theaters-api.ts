@@ -11,3 +11,9 @@ export async function getTheaterName(theaterId : number): Promise<string> {
   if (!res.ok) throw new Error("Failed to fetch theater name");
   return res.text();
 }
+
+export async function fetchTheatersByCityId(cityId: number): Promise<Theater[]> {
+  const res = await fetch(`http://localhost:8080/api/theaters?cityId=${cityId}`);
+  if (!res.ok) throw new Error("Failed to fetch theater");
+  return res.json();
+}

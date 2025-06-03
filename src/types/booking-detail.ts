@@ -1,7 +1,7 @@
 import { User } from './user';
 import { Ticket } from './ticket'   
 
-export interface Booking{
+export interface BookingDetail{
     id: string,
     bookingCode: string,
     user?: User,
@@ -13,4 +13,5 @@ export interface Booking{
     serviceFee: number,
     amount: number,
     paymentMethod: string,
+    tickets: Ticket[]
 }

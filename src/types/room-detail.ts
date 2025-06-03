@@ -1,7 +1,7 @@
 import { Seat } from './seat';
 
-export interface Room {
-  id: number
+export interface RoomDetail {
+  id: string
   name: string
   seat: Seat[];
 }

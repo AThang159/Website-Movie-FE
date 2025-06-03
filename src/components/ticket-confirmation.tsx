@@ -7,16 +7,13 @@ import Barcode from 'react-barcode';
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 
-import { Movie } from "@/types/movie"
-import { Showtime } from "@/types/showtime"
-import { Booking } from "@/types/booking"
+import { Seat } from "@/types/seat"
 
 import { fetchBooking } from "@/lib/api/booking-api"
-import { getShowtime } from "@/lib/api/showtimes-api"
-import { getMovie } from "@/lib/api/movies-api"
-import { getRoomName } from "@/lib/api/rooms-api"
-import { getTheaterName } from "@/lib/api/theaters-api"
-import { Seat } from "@/types/seat"
+import { fetchShowtime} from "@/lib/api/showtimes-api"
+
+import { ShowtimeDetail } from "@/types/showtime-detail";
+import { BookingDetail } from "@/types/booking-detail";
 
 interface TicketConfirmationProps{
   bookingCode: string
@@ -24,12 +21,9 @@ interface TicketConfirmationProps{
 
 export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
 
-    const [booking, setBooking] = useState<Booking>();
-    const [showtime, setShowtime] = useState<Showtime>();
+    const [booking, setBooking] = useState<BookingDetail>();
+    const [showtime, setShowtime] = useState<ShowtimeDetail>();
     const [seats, setSeats] = useState<Seat[]>([]);
-    const [movie, setMovie] = useState<Movie>();
-    const [roomName, setRoomName] = useState<string>();
-    const [theaterName, setTheaterName] = useState<string>();
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [serviceFee, setServiceFee] = useState<number>(0);
     const ticketRef = useRef<HTMLDivElement>(null)
@@ -48,13 +42,13 @@ export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
     }, []);
 
     useEffect(() =>{
-          const fetchShowtime = async () => {
+          const fetchData = async () => {
             if (!booking){
               return;
             }
               try {
                   const showtimeId = booking?.tickets[0].seatStatus.showtimeId
-                  const response = await getShowtime(showtimeId);
+                  const response = await fetchShowtime(showtimeId);
                   console.log(response);
                   setShowtime(response);
               } catch (error){
@@ -62,59 +56,8 @@ export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
                   setShowtime(undefined);
               }
           }
-          fetchShowtime();
+          fetchData();
       }, [booking]);
-    
-      useEffect(() =>{
-          const fecthMovie = async () => {
-              try {
-                  if (showtime?.movieId === "" || !showtime?.movieId) {
-                  setMovie(undefined);
-                  return;
-                  }
-                  const response = await getMovie(showtime?.movieId);
-                  setMovie(response);
-              } catch (error){
-                  console.error("Failed to fetch movie", error);
-                  setMovie(undefined);
-              }
-          }
-          fecthMovie();
-      }, [showtime]);
-    
-      useEffect(() =>{
-          const fecthRoomName = async () => {
-          if (showtime?.roomId === undefined) {
-              setRoomName(undefined);
-              return;
-          }
-          try {
-              const response = await getRoomName(showtime?.roomId);
-              setRoomName(response);
-          } catch (error){
-              console.error("Failed to fetch room name", error);
-              setRoomName(undefined);
-          }
-          }
-          fecthRoomName();
-      }, [showtime]);
-    
-    useEffect(() =>{
-      const fecthTheaterName = async () => {
-        if (showtime?.theaterId === undefined) {
-          setTheaterName(undefined);
-          return;
-        }
-        try {
-          const response = await getTheaterName(showtime?.theaterId);
-          setTheaterName(response);
-        } catch (error){
-          console.error("Failed to fetch theater name", error);
-          setTheaterName(undefined);
-        }
-      }
-      fecthTheaterName();
-    }, [showtime]);
 
     useEffect(() => {
       if (!booking) return;
@@ -194,15 +137,15 @@ export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-medium">{movie?.title}</h3>
+              <h3 className="font-medium">{showtime?.movie.title}</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="text-gray-500">Rạp chiếu</div>
-                  <div>{theaterName}</div>
+                  <div>{showtime?.theater?.name}</div>
                 </div>
                 <div>
                   <div className="text-gray-500">Phòng chiếu</div>
-                  <div>{roomName}</div>
+                  <div>{showtime?.room?.name}</div>
                 </div>
                 <div>
                   <div className="text-gray-500">Suất chiếu</div>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientBody from "./ClientBody";
-import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Inter } from "next/font/google";
 
@@ -29,7 +28,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className="antialiased">
         <ClientBody>
           <div className="flex min-h-screen flex-col">
-            <Header />
+            {/* <Header /> */}
             <main className="flex-1">{children}</main>
             <Footer />
           </div>

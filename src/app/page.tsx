@@ -1,5 +1,6 @@
 import { MovieCarousel } from "@/components/movie-carousel";
 import { NewsCard } from "@/components/news-card";
+import { Header } from "@/components/header";
 
 // Mock data for news articles
 const featuredNews = {
@@ -51,6 +52,7 @@ export default function Home() {
   
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6">
+      <Header />
       <MovieCarousel title="Đang chiếu" viewAllLink="/dang-chieu" />
       <MovieCarousel title="Sắp chiếu" viewAllLink="/sap-chieu" />
 

@@ -7,15 +7,11 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CreditCard, Smartphone, Building2 } from "lucide-react"
-import { Movie } from "@/types/movie"
-import { Showtime } from "@/types/showtime"
 import { SeatStatus } from "@/types/seat-status"
+import { ShowtimeDetail } from "@/types/showtime-detail"
 
 interface PaymentFormProps {
-    showtimeData?: Showtime
-    movieData?: Movie
-    theaterNameData?: string
-    roomNameData?:string
+    showtimeData?: ShowtimeDetail
     seatStatusesData?: SeatStatus[]
     selectedSeatsData?: number[]
     totalPriceData?: number
@@ -25,9 +21,6 @@ interface PaymentFormProps {
 
 export function PaymentForm({ 
     showtimeData, 
-    movieData, 
-    theaterNameData, 
-    roomNameData,
     seatStatusesData,
     selectedSeatsData,
     totalPriceData,
@@ -35,12 +28,9 @@ export function PaymentForm({
     goToStep
  }: PaymentFormProps) {
 
-    const [showtime, setShowtime] = useState<Showtime>();
+    const [showtime, setShowtime] = useState<ShowtimeDetail>();
     const [seatStatuses, setSeatStatuses] = useState<SeatStatus[]>([]);
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
-    const [movie, setMovie] = useState<Movie>();
-    const [roomName, setRoomName] = useState<string>("");
-    const [theaterName, setTheaterName] = useState<string>("");
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [serviceFee, setServiceFee] = useState<number>(0);
 
@@ -63,18 +53,6 @@ export function PaymentForm({
     useEffect(() => {
         if (selectedSeatsData) setSelectedSeats(selectedSeatsData);
     }, [selectedSeatsData]);
-
-    useEffect(() => {
-        if (movieData) setMovie(movieData);
-    }, [movieData]);
-
-    useEffect(() => {
-        if (roomNameData) setRoomName(roomNameData);
-    }, [roomNameData]);
-
-    useEffect(() => {
-        if (theaterNameData) setTheaterName(theaterNameData);
-    }, [theaterNameData]);
 
     useEffect(() => {
         if (totalPriceData) setTotalPrice(totalPriceData);
@@ -265,8 +243,8 @@ export function PaymentForm({
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="font-medium text-sm">{movie?.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{theaterName}</p>
+              <h3 className="font-medium text-sm">{showtime?.movie?.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{showtime?.theater?.name}</p>
             </div>
 
             <div className="space-y-2 text-sm">
@@ -276,7 +254,7 @@ export function PaymentForm({
               </div>
               <div className="flex justify-between">
                 <span>Phòng chiếu:</span>
-                <span>{roomName}</span>
+                <span>{showtime?.room?.name}</span>
               </div>
               <div className="flex justify-between">
                 <span>Ghế:</span>

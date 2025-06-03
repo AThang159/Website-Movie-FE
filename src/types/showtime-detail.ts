@@ -1,9 +1,10 @@
 import { Movie } from "./movie";
 import { Format } from "./format";
 import { Room } from "./room";
+import { SeatStatus } from "./seat-status";
 import { Theater } from "./theater";
 
-export interface Showtime {
+export interface ShowtimeDetail {
   id: string,
   movie: Movie;
   showDate: string;
@@ -15,6 +16,4 @@ export interface Showtime {
   language: string;
   format: Format;
   price: number;
-  seatsAvailable: number
-  seatsTotal: number
 }

@@ -1,16 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Movie } from "@/types/movie"
-import { Showtime } from "@/types/showtime"
-import { getShowtime } from "@/lib/api/showtimes-api"
-import { getMovie } from "@/lib/api/movies-api"
-import { getSeatStatusesByShowtime } from "@/lib/api/seat-statuses-api"
+import { fetchShowtime } from "@/lib/api/showtimes-api"
 import { SeatStatus } from "@/types/seat-status"
-import { getRoomName } from "@/lib/api/rooms-api"
-import { getTheaterName } from "@/lib/api/theaters-api"
 import { SeatSelection } from "./seat-selection";
 import { PaymentForm } from "./payment-form";
+import { ShowtimeDetail } from "@/types/showtime-detail"
+import { fetchSeatStatusesByShowtime } from "@/lib/api/seat-statuses-api";
 
 
 interface MovieBookingProps {
@@ -21,21 +17,18 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
 
   const [currentStep, setCurrentStep] = useState(1);
 
-  const [showtime, setShowtime] = useState<Showtime>();
+  const [showtime, setShowtime] = useState<ShowtimeDetail>();
   const [seatStatuses, setSeatStatuses] = useState<SeatStatus[]>([]);
   const [unavailableSeats, setUnavailableSeats] = useState<number[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const [vipSeats, setVipSeats] = useState<number[]>([]);
-  const [movie, setMovie] = useState<Movie>();
-  const [roomName, setRoomName] = useState<string>();
-  const [theaterName, setTheaterName] = useState<string>();
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
 
   useEffect(() =>{
-      const fetchShowtime = async () => {
+      const fetchData = async () => {
           try {
-              const response = await getShowtime(showtimeId);
+              const response = await fetchShowtime(showtimeId);
               console.log(response);
               setShowtime(response);
           } catch (error){
@@ -43,73 +36,22 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
               setShowtime(undefined);
           }
       }
-      fetchShowtime();
+      fetchData();
   }, []);
-
-  useEffect(() =>{
-      const fecthMovie = async () => {
-          try {
-              if (showtime?.movieId === "" || !showtime?.movieId) {
-              setMovie(undefined);
-              return;
-              }
-              const response = await getMovie(showtime?.movieId);
-              setMovie(response);
-          } catch (error){
-              console.error("Failed to fetch movie", error);
-              setMovie(undefined);
-          }
-      }
-      fecthMovie();
-  }, [showtime]);
-
-  useEffect(() =>{
-      const fecthRoomName = async () => {
-      if (showtime?.roomId === undefined) {
-          setRoomName(undefined);
-          return;
-      }
-      try {
-          const response = await getRoomName(showtime?.roomId);
-          setRoomName(response);
-      } catch (error){
-          console.error("Failed to fetch room name", error);
-          setRoomName(undefined);
-      }
-      }
-      fecthRoomName();
-  }, [showtime]);
-
-  useEffect(() =>{
-      const fecthTheaterName = async () => {
-      if (showtime?.theaterId === undefined) {
-          setTheaterName(undefined);
-          return;
-      }
-          try {
-              const response = await getTheaterName(showtime?.theaterId);
-              setTheaterName(response);
-          } catch (error){
-              console.error("Failed to fetch theater name", error);
-              setTheaterName(undefined);
-          }
-      }
-      fecthTheaterName();
-  }, [showtime]);
 
   useEffect(() => {
       if (!showtime) return
 
-      const fetchSeatStatuses = async () => {
+      const fetchData = async () => {
           try {
-              const seatStatuses = await getSeatStatusesByShowtime(showtime.id)
+              const seatStatuses = await fetchSeatStatusesByShowtime(showtimeId)
               const vipSeats = seatStatuses
               .filter((s) => s.seat.type === "VIP")
               .map((s) => s.seat.id)
               setVipSeats(vipSeats) 
               const bookedSeats = seatStatuses
               .filter((s) => s.ticketId !== null)
-              .map((s) => s.seat.id)
+              .map((s) => s.id)
               setUnavailableSeats(bookedSeats)
               setSeatStatuses(seatStatuses)
           } catch (error) {
@@ -117,7 +59,7 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
               setUnavailableSeats([])
           }
       }
-      fetchSeatStatuses()
+      fetchData()
   }, [showtime])
 
   const handleSelectionChange = (seats: number[], price: number) => {
@@ -131,9 +73,6 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
         return(
           <SeatSelection 
             showtimeData={showtime} 
-            movieData={movie}
-            theaterNameData={theaterName}
-            roomNameData={roomName}
             seatStatusesData={seatStatuses}
             unavailableSeatsData={unavailableSeats}
             selectedSeatsData={selectedSeats}
@@ -146,9 +85,6 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
           <div>
             <PaymentForm 
               showtimeData={showtime} 
-              movieData={movie}
-              theaterNameData={theaterName}
-              roomNameData={roomName}
               seatStatusesData={seatStatuses}
               selectedSeatsData={selectedSeats}
               totalPriceData={totalPrice}

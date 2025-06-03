@@ -1,0 +1,15 @@
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: rebase (abort): returning to refs/heads/main
+[33m942f7cd[m[33m ([m[1;31morigin/master[m[33m)[m HEAD@{1}: rebase (start): checkout HEAD~3
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{2}: rebase (finish): returning to refs/heads/main
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{3}: rebase (start): checkout HEAD~3
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{4}: rebase (finish): returning to refs/heads/main
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{5}: rebase (start): checkout HEAD~2
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{6}: rebase (abort): returning to refs/heads/main
+[33m8127b37[m HEAD@{7}: commit: feat: add UI PaymentForm and TicketConfirmation
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{8}: reset: moving to HEAD@{1}
+[33m942f7cd[m[33m ([m[1;31morigin/master[m[33m)[m HEAD@{9}: rebase (start): checkout HEAD~2
+[33m518fb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{10}: commit: feat: add UI seat select and booking
+[33m9659d21[m HEAD@{11}: commit: add UI movie-booking
+[33m942f7cd[m[33m ([m[1;31morigin/master[m[33m)[m HEAD@{12}: Branch: renamed refs/heads/master to refs/heads/main
+[33m942f7cd[m[33m ([m[1;31morigin/master[m[33m)[m HEAD@{14}: commit: feat: add showtimes UI and fetch hook for movie details
+[33m411ad37[m HEAD@{15}: initial pull

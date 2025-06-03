@@ -1,8 +1,9 @@
 import { Showtime } from "@/types/showtime";
+import { ShowtimeDetail } from "@/types/showtime-detail";
 
-export async function fetchShowtimesByMovieAndDate(movieId: string, showDate: string): Promise<Showtime[]> {
+export async function fetchShowtimesByMovieAndDateAndTheaterId(movieId: string, showDate: string, theaterId: number): Promise<Showtime[]> {
 //   console.log("Gửi API với movieId =", movieId, "showDate =", showDate);
-  const url = `http://localhost:8080/api/showtimes?movieId=${movieId}&showDate=${showDate}`;
+  const url = `http://localhost:8080/api/showtimes?movieId=${movieId}&showDate=${showDate}&theaterId=${theaterId}`;
   
   const res = await fetch(url);
   if (!res.ok) {
@@ -13,7 +14,7 @@ export async function fetchShowtimesByMovieAndDate(movieId: string, showDate: st
   return res.json();
 }
 
-export async function getShowtime(id: string): Promise<Showtime> {
+export async function fetchShowtime(id: string): Promise<ShowtimeDetail> {
   const url = `http://localhost:8080/api/showtimes/${id}`;
 
   const res = await fetch(url);

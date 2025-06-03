@@ -1,6 +1,7 @@
 import { Theater } from "./theater";
 
-export interface Chain {
+export interface ChainDetail {
   id: number,
   name: string;
+  theater: Theater[]
 }

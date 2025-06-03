@@ -1,4 +1,4 @@
-import { Format } from "@/types/movie-format";
+import { Format } from "@/types/format";
 
 export async function fetchMovieFormats(): Promise<Format[]> {
   const res = await fetch("http://localhost:8080/api/movie-formats");

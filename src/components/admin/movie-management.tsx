@@ -1,0 +1,180 @@
+"use client"
+
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Plus, Edit, Trash2, Search } from "lucide-react"
+
+export function MovieManagement() {
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [movies] = useState([
+    {
+      id: 1,
+      title: "Doraemon Movie 44: Nobita Và Cuộc Phiêu Lưu Ở Vùng Dales",
+      genre: "Hoạt hình",
+      duration: "110 phút",
+      rating: "P",
+      releaseDate: "2025-05-30",
+      status: "Đang chiếu",
+    },
+    {
+      id: 2,
+      title: "Spider-Man: No Way Home",
+      genre: "Hành động",
+      duration: "148 phút",
+      rating: "T13",
+      releaseDate: "2025-05-15",
+      status: "Đang chiếu",
+    },
+    {
+      id: 3,
+      title: "Avatar: The Way of Water",
+      genre: "Khoa học viễn tưởng",
+      duration: "192 phút",
+      rating: "T13",
+      releaseDate: "2025-06-01",
+      status: "Sắp chiếu",
+    },
+  ])
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Quản lý phim</h1>
+        <Button onClick={() => setShowAddForm(true)} className="bg-red-500 hover:bg-red-600">
+          <Plus className="w-4 h-4 mr-2" />
+          Thêm phim mới
+        </Button>
+      </div>
+
+      {showAddForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Thêm phim mới</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Tên phim</Label>
+                  <Input id="title" placeholder="Nhập tên phim" />
+                </div>
+                <div>
+                  <Label htmlFor="genre">Thể loại</Label>
+                  <Input id="genre" placeholder="Nhập thể loại" />
+                </div>
+                <div>
+                  <Label htmlFor="duration">Thời lượng (phút)</Label>
+                  <Input id="duration" type="number" placeholder="110" />
+                </div>
+                <div>
+                  <Label htmlFor="rating">Phân loại</Label>
+                  <select id="rating" className="w-full px-3 py-2 border rounded-md">
+                    <option value="P">P - Phù hợp mọi lứa tuổi</option>
+                    <option value="T13">T13 - Từ 13 tuổi trở lên</option>
+                    <option value="T16">T16 - Từ 16 tuổi trở lên</option>
+                    <option value="T18">T18 - Từ 18 tuổi trở lên</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="releaseDate">Ngày khởi chiếu</Label>
+                  <Input id="releaseDate" type="date" />
+                </div>
+                <div>
+                  <Label htmlFor="director">Đạo diễn</Label>
+                  <Input id="director" placeholder="Nhập tên đạo diễn" />
+                </div>
+                <div>
+                  <Label htmlFor="cast">Diễn viên</Label>
+                  <Input id="cast" placeholder="Nhập tên diễn viên" />
+                </div>
+                <div>
+                  <Label htmlFor="poster">URL Poster</Label>
+                  <Input id="poster" placeholder="https://example.com/poster.jpg" />
+                </div>
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="description">Mô tả</Label>
+                <Textarea id="description" placeholder="Nhập mô tả phim" rows={3} />
+              </div>
+              <div className="md:col-span-2 flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setShowAddForm(false)}>
+                  Hủy
+                </Button>
+                <Button className="bg-red-500 hover:bg-red-600">Thêm phim</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Danh sách phim</CardTitle>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input placeholder="Tìm kiếm phim..." className="pl-10 w-64" />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-3">Tên phim</th>
+                  <th className="text-left p-3">Thể loại</th>
+                  <th className="text-left p-3">Thời lượng</th>
+                  <th className="text-left p-3">Phân loại</th>
+                  <th className="text-left p-3">Ngày khởi chiếu</th>
+                  <th className="text-left p-3">Trạng thái</th>
+                  <th className="text-left p-3">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {movies.map((movie) => (
+                  <tr key={movie.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3 font-medium">{movie.title}</td>
+                    <td className="p-3">{movie.genre}</td>
+                    <td className="p-3">{movie.duration}</td>
+                    <td className="p-3">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{movie.rating}</span>
+                    </td>
+                    <td className="p-3">{movie.releaseDate}</td>
+                    <td className="p-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          movie.status === "Đang chiếu"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {movie.status}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <div className="flex space-x-2">
+                        <Button size="sm" variant="outline">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

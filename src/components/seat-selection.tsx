@@ -4,15 +4,12 @@ import { useState, useEffect } from "react"
 import { ArrowLeft, Search, HelpCircle, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Movie } from "@/types/movie"
 import { Showtime } from "@/types/showtime"
 import { SeatStatus } from "@/types/seat-status"
+import { ShowtimeDetail } from "@/types/showtime-detail"
 
 interface SeatSelectionProps {
-    showtimeData?: Showtime
-    movieData?: Movie
-    theaterNameData?: string
-    roomNameData?:string
+    showtimeData?: ShowtimeDetail
     seatStatusesData?: SeatStatus[]
     unavailableSeatsData?: number[]
     selectedSeatsData?: number[]
@@ -23,9 +20,6 @@ interface SeatSelectionProps {
 
 export function SeatSelection({ 
     showtimeData, 
-    movieData, 
-    theaterNameData, 
-    roomNameData,
     seatStatusesData,
     unavailableSeatsData,
     selectedSeatsData,
@@ -33,14 +27,11 @@ export function SeatSelection({
     onSelectionChange,
     goToStep }: SeatSelectionProps) {
     
-    const [showtime, setShowtime] = useState<Showtime>();
+    const [showtime, setShowtime] = useState<ShowtimeDetail>();
     const [seatStatuses, setSeatStatuses] = useState<SeatStatus[]>([]);
     const [unavailableSeats, setUnavailableSeats] = useState<number[]>([]);
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [vipSeats, setVipSeats] = useState<number[]>([]);
-    const [movie, setMovie] = useState<Movie>();
-    const [roomName, setRoomName] = useState<string>("");
-    const [theaterName, setTheaterName] = useState<string>("");
     const [totalPrice, setTotalPrice] = useState<number>(0);
 
     useEffect(() => {
@@ -62,18 +53,6 @@ export function SeatSelection({
     useEffect(() => {
         if (vipSeatsData) setVipSeats(vipSeatsData);
     }, [vipSeatsData]);
-
-    useEffect(() => {
-        if (movieData) setMovie(movieData);
-    }, [movieData]);
-
-    useEffect(() => {
-        if (roomNameData) setRoomName(roomNameData);
-    }, [roomNameData]);
-
-    useEffect(() => {
-        if (theaterNameData) setTheaterName(theaterNameData);
-    }, [theaterNameData]);
 
     const handleContinue = () => {
         if (onSelectionChange) {
@@ -202,10 +181,10 @@ export function SeatSelection({
                 <div className="space-y-6">
                     <Card>
                         <CardContent className="p-6">
-                        <h3 className="font-bold text-lg mb-4">{movie?.title}</h3>
+                        <h3 className="font-bold text-lg mb-4">{showtime?.movie?.title}</h3>
                         <div className="space-y-2 text-sm text-gray-600">
                             <div>
-                            Rạp <span className="font-medium">{theaterName}</span>
+                            Rạp <span className="font-medium">{showtime?.theater?.name}</span>
                             </div>
                             <div>
                             Suất <span className="font-medium">{showtime?.startTime}</span>
@@ -214,7 +193,7 @@ export function SeatSelection({
                             Ngày <span className="font-medium">{showtime?.showDate}</span>
                             </div>
                             <div>
-                            Phòng chiếu <span className="font-medium">{roomName}</span>
+                            Phòng chiếu <span className="font-medium">{showtime?.room?.name}</span>
                             </div>
                             <div>
                             Ghế{" "}
