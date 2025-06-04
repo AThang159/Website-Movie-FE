@@ -16,7 +16,15 @@ export function middleware(request: NextRequest) {
 
     const token = request.cookies.get('token')?.value
 
+
   if (pathname === '/admin/login') {
+    if (token){
+      const decoded = parseJwt(token)
+
+      if (decoded.role === 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin', request.url))
+      }
+    }
     return NextResponse.next()
   }
 
@@ -27,7 +35,6 @@ export function middleware(request: NextRequest) {
     }
 
     const decoded = parseJwt(token)
-    console.log(decoded)
 
     if (!decoded || decoded.role !== 'ADMIN') {
       // return null;
