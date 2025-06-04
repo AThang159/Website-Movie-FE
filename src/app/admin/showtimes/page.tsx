@@ -1,5 +1,17 @@
+import { AdminHeader } from "@/components/admin/admin-header"
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { ShowtimeManagement } from "@/components/admin/showtime-management"
 
 export default function AdminShowtimesPage() {
-  return <ShowtimeManagement />
+  return (
+      <div className="min-h-screen bg-gray-50 flex">
+        <AdminSidebar />
+        <div className="flex-1 flex flex-col">
+          <AdminHeader />
+          <div className="flex-1 p-6">
+            <ShowtimeManagement />
+          </div>
+        </div>
+      </div>
+    )
 }
