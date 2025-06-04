@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { fetchOverview } from "@/lib/api/dashboard-api"
+import { fetchOverview } from "@/lib/api/admin-api"
 import { fetchShowtimesToday } from "@/lib/api/showtimes-api";
 import { Showtime } from "@/types/showtime";
 import { Film, Building2, Users, Ticket, TrendingUp, Calendar } from "lucide-react"

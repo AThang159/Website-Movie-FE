@@ -10,6 +10,12 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Lock, Mail, AlertCircle, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { fetchLoginRequest } from "@/lib/api/auth-api"
+
+type LoginPayload = {
+  username: string;
+  password: string;
+};
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false)
@@ -17,7 +23,7 @@ export default function AdminLogin() {
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   })
 
@@ -38,34 +44,24 @@ export default function AdminLogin() {
     setIsLoading(true)
     setError("")
 
-    // Basic validation
-    if (!formData.email || !formData.password) {
+    if (!formData.username || !formData.password) {
       setError("Vui lòng điền đầy đủ thông tin")
       setIsLoading(false)
       return
     }
 
-    if (!formData.email.includes("@")) {
-      setError("Email không hợp lệ")
-      setIsLoading(false)
-      return
-    }
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Demo credentials
-      if (formData.email === "admin@moveek.com" && formData.password === "admin123") {
-        // Simulate successful login
-        localStorage.setItem("adminToken", "demo-token")
-        if (rememberMe) {
-          localStorage.setItem("rememberAdmin", "true")
-        }
-        router.push("/admin")
-      } else {
-        setError("Email hoặc mật khẩu không chính xác")
+      const payload: LoginPayload = {
+        username: formData.username,
+        password: formData.password,
       }
+      const res = await fetchLoginRequest(payload);
+      console.log(res)
+      if (res.message == "Login successful") {
+        window.location.href = "/admin";
+      } else {
+        setError("Đăng nhập thất bại, vui lòng thử lại.");
+      }  
     } catch (err) {
       setError("Đã xảy ra lỗi. Vui lòng thử lại.")
     } finally {
@@ -91,17 +87,17 @@ export default function AdminLogin() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email Field */}
+              {/* Username Field */}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    id="email"
-                    name="email"
-                    type="email"
+                    id="username"
+                    name="username"
+                    type="username"
                     placeholder="admin@moveek.com"
-                    value={formData.email}
+                    value={formData.username}
                     onChange={handleInputChange}
                     className="pl-10"
                     disabled={isLoading}
@@ -184,8 +180,8 @@ export default function AdminLogin() {
                 <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
                   <p className="font-medium text-blue-900 mb-1">Thông tin đăng nhập demo:</p>
-                  <p className="text-blue-700">Email: admin@moveek.com</p>
-                  <p className="text-blue-700">Mật khẩu: admin123</p>
+                  <p className="text-blue-700">Tên đăng nhập: ADMIN</p>
+                  <p className="text-blue-700">Mật khẩu: ADMIN</p>
                 </div>
               </div>
             </div>
