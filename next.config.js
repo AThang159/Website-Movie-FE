@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable output for Netlify deployment
-  distDir: 'out',
   images: {
     unoptimized: true,
     domains: [
