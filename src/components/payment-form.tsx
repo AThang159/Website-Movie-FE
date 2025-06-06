@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { CreditCard, Smartphone, Building2 } from "lucide-react"
 import { SeatStatus } from "@/types/seat-status"
 import { ShowtimeDetail } from "@/types/showtime-detail"
+import { createPayment } from "@/lib/api/payment-api"
 
 interface PaymentFormProps {
     showtimeData?: ShowtimeDetail
@@ -62,6 +63,9 @@ export function PaymentForm({
         setServiceFee(selectedSeats.length * 5000);
     }, [selectedSeats])
 
+    const [paymentMethod, setPaymentMethod] = useState("credit-card")
+    const [agreeTerms, setAgreeTerms] = useState(false)
+
     const handleContinue = async () => {
       if (!agreeTerms) {
         alert("Bạn cần đồng ý với điều khoản trước khi thanh toán.")
@@ -77,53 +81,36 @@ export function PaymentForm({
       setError(null)
 
       try {
-        const amount = totalPrice + serviceFee; // Ví dụ: nhân 1000 nếu giá trị cần tính theo đơn vị VNĐ
+        const amount = totalPrice + serviceFee;
 
-        const response = await fetch("http://localhost:8080/api/payment/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: amount,
-              userId: null,
-              customerFullName: `${customerFirstName} ${customerLastName}`,
-              customerPhone: customerPhone,
-              customerEmail: customerEmail,
-              seatStatusIds: selectedSeats,
-              totalPrice: totalPrice,
-              serviceFee: serviceFee,
-              paymentMethod: paymentMethod,
-          }),
-        })
+        const data = await createPayment({
+          amount,
+          customerFirstName,
+          customerLastName,
+          customerPhone,
+          customerEmail,
+          selectedSeatIds: selectedSeats,
+          totalPrice,
+          serviceFee,
+          paymentMethod
+        });
 
-        if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.message || "Lỗi khi gọi API thanh toán")
-        }
-
-        const data = await response.json()
-        console.log(data)
         if (!data.url) {
-          throw new Error("Không nhận được URL thanh toán")
+          throw new Error("Không nhận được URL thanh toán");
         }
 
         if (onSelectionChange) {
-          onSelectionChange(selectedSeats, totalPrice)
+          onSelectionChange(selectedSeats, totalPrice);
         }
 
-        // Chuyển hướng người dùng đến trang thanh toán
-        window.location.href = data.url
-
+        window.location.href = data.url;
       } catch (err: any) {
-        setError(err.message || "Đã xảy ra lỗi khi tạo thanh toán")
-        console.error("VNPay error:", err)
+        setError(err.message || "Đã xảy ra lỗi khi tạo thanh toán");
+        console.error("VNPay error:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-
-
-    const [paymentMethod, setPaymentMethod] = useState("credit-card")
-    const [agreeTerms, setAgreeTerms] = useState(false)
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat("vi-VN").format(price)

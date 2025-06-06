@@ -11,11 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Lock, Mail, AlertCircle, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { fetchLoginRequest } from "@/lib/api/auth-api"
+import { LoginPayload } from "@/types/login-pay-load"
 
-type LoginPayload = {
-  username: string;
-  password: string;
-};
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false)
@@ -35,7 +32,6 @@ export default function AdminLogin() {
       ...prev,
       [name]: value,
     }))
-    // Clear error when user starts typing
     if (error) setError("")
   }
 
@@ -56,14 +52,16 @@ export default function AdminLogin() {
         password: formData.password,
       }
       const res = await fetchLoginRequest(payload);
-      console.log(res)
-      if (res.message == "Login successful") {
+      if (res.success) {
+        localStorage.setItem("token", res.token)
         window.location.href = "/admin";
-      } else {
-        setError("Đăng nhập thất bại, vui lòng thử lại.");
-      }  
-    } catch (err) {
-      setError("Đã xảy ra lỗi. Vui lòng thử lại.")
+      }
+      else {
+        setError(res.message)
+      }
+    } catch (error: any) {
+        console.error(error);
+        setError(error.message || "Không thể tải dữ liệu");
     } finally {
       setIsLoading(false)
     }

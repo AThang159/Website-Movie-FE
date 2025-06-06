@@ -12,9 +12,17 @@ export async function fetchLoginRequest({ username, password }: LoginPayload) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ username, password }),
-    credentials: 'include'
+    credentials: "include",
   });
 
-  if (!res.ok) throw new Error("Failed to fetch login");
+  if (!res.ok) {
+    if (res.status === 401) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Unauthorized");
+    }
+    const errorText = await res.text();
+    throw new Error(`HTTP error ${res.status}: ${errorText}`);
+  }
+
   return res.json();
 }

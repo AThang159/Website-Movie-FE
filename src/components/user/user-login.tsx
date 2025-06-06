@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Lock, Mail, AlertCircle, Phone, User } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { LoginPayload } from "@/types/login-pay-load"
+import { fetchLoginRequest } from "@/lib/api/auth-api"
 
 export default function UserLogin() {
   const [isLogin, setIsLogin] = useState(true) // true = login, false = register
@@ -19,7 +21,7 @@ export default function UserLogin() {
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
     confirmPassword: "",
     fullName: "",
@@ -44,13 +46,13 @@ export default function UserLogin() {
 
     // Basic validation
     if (isLogin) {
-      if (!formData.email || !formData.password) {
+      if (!formData.username || !formData.password) {
         setError("Vui lòng điền đầy đủ thông tin")
         setIsLoading(false)
         return
       }
     } else {
-      if (!formData.email || !formData.password || !formData.fullName || !formData.phone) {
+      if (!formData.username || !formData.password || !formData.fullName || !formData.phone) {
         setError("Vui lòng điền đầy đủ thông tin")
         setIsLoading(false)
         return
@@ -67,36 +69,22 @@ export default function UserLogin() {
       }
     }
 
-    if (!formData.email.includes("@")) {
-      setError("Email không hợp lệ")
-      setIsLoading(false)
-      return
-    }
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      if (isLogin) {
-        // Demo login credentials
-        if (formData.email === "user@moveek.com" && formData.password === "user123") {
-          localStorage.setItem("userToken", "demo-user-token")
-          localStorage.setItem("userName", "Nguyễn Văn A")
-          if (rememberMe) {
-            localStorage.setItem("rememberUser", "true")
-          }
-          router.push("/")
-        } else {
-          setError("Email hoặc mật khẩu không chính xác")
-        }
-      } else {
-        // Registration success
-        localStorage.setItem("userToken", "demo-user-token")
-        localStorage.setItem("userName", formData.fullName)
-        router.push("/")
+      const payload: LoginPayload = {
+        username: formData.username,
+        password: formData.password,
       }
-    } catch (err) {
-      setError("Đã xảy ra lỗi. Vui lòng thử lại.")
+      const res = await fetchLoginRequest(payload);
+      if (res.success) {
+        localStorage.setItem("token", res.token)
+        window.location.href = "/";
+      }
+      else {
+        setError(res.message)
+      }
+    } catch (error: any) {
+        console.error(error);
+        setError(error.message || "Không thể tải dữ liệu");
     } finally {
       setIsLoading(false)
     }
@@ -106,7 +94,7 @@ export default function UserLogin() {
     setIsLogin(!isLogin)
     setError("")
     setFormData({
-      email: "",
+      username: "",
       password: "",
       confirmPassword: "",
       fullName: "",
@@ -197,17 +185,17 @@ export default function UserLogin() {
                   </>
                 )}
 
-                {/* Email Field */}
+                {/* username Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="username">username</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="example@email.com"
-                      value={formData.email}
+                      id="username"
+                      name="username"
+                      type="username"
+                      placeholder="USER"
+                      value={formData.username}
                       onChange={handleInputChange}
                       className="pl-10"
                       disabled={isLoading}
@@ -390,7 +378,7 @@ export default function UserLogin() {
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                     <div className="text-sm">
                       <p className="font-medium text-blue-900 mb-1">Thông tin đăng nhập demo:</p>
-                      <p className="text-blue-700">Email: user@moveek.com</p>
+                      <p className="text-blue-700">username: user@moveek.com</p>
                       <p className="text-blue-700">Mật khẩu: user123</p>
                     </div>
                   </div>

@@ -9,12 +9,18 @@ import { useEffect, useState } from "react"
 
 type StatItem = {
   title: string;
-  value: number;
+  value?: number;
   icon: any;
   bg: string;
   color: string;
 };
 
+export interface Overview {
+    countMovies: number;
+    countUsers: number;
+    countTheaters: number;
+    countBookings: number;
+}
 
 export function DashboardOverview() {
   const [stats, setStats] = useState<StatItem[]>();
@@ -23,31 +29,32 @@ export function DashboardOverview() {
     const fetchData = async () => {
       try {
         const response = await fetchOverview();
-        const convertedStats = [
+        console.log(response)
+        const convertedStats: StatItem[] = [
           {
             title: "Tổng số phim",
-            value: response.countMovies,
+            value: response?.data.countMovies,
             icon: Film,
             bg: "bg-blue-100",
             color: "text-blue-600"
           },
           {
             title: "Tổng số rạp",
-            value: response.countTheaters,
+            value: response?.data.countTheaters,
             icon: Building2,
             bg: "bg-green-100",
             color: "text-green-600"
           },
           {
             title: "Tổng số người dùng",
-            value: response.countUsers,
+            value: response?.data.countUsers,
             icon: Users,
             bg: "bg-yellow-100",
             color: "text-yellow-600"
           },
           {
             title: "Lượt đặt vé",
-            value: response.countBookings,
+            value: response?.data.countBookings,
             icon: Ticket,
             bg: "bg-red-100",
             color: "text-red-600"
@@ -55,14 +62,14 @@ export function DashboardOverview() {
         ];
 
         setStats(convertedStats);
+
       } catch (error) {
         console.log("Failed to fetch stats overview", error);
         setStats(undefined);
       }
     };
-
     fetchData();
-  }, []);
+  },[])
 
   useEffect(() => {
     const fetchShowtimes = async () => {
