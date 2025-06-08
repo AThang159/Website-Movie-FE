@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/types/api-response";
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 
 export interface Overview {
     countMovies: number;
@@ -9,7 +9,7 @@ export interface Overview {
 }
 
 export async function fetchOverview(): Promise<Overview>{
-  const res = await fetch(`${API_BASE_URL}/dashboard/overview`);
+  const res = await fetch(`${API_BACKEND_URL}/dashboard/overview`);
   if (!res.ok) throw new Error("Failed to fetch overview");
 
   const json: ApiResponse<Overview> = await res.json();

@@ -1,8 +1,8 @@
 import { ApiResponse } from "@/types/api-response";
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 
 export async function getRoomName(roomId: number): Promise<string> {
-  const res = await fetch(`${API_BASE_URL}/rooms/${roomId}/name`);
+  const res = await fetch(`${API_BACKEND_URL}/rooms/${roomId}/name`);
   if (!res.ok) throw new Error("Failed to fetch room name");
 
   const json: ApiResponse<string> = await res.json();

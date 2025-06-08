@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/types/api-response";
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 
 interface CreatePaymentParams {
   amount: number;
@@ -19,7 +19,7 @@ export interface PaymentResponse {
 
 export async function createPayment(params: CreatePaymentParams): Promise<PaymentResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/payment/create`, {
+    const response = await fetch(`${API_BACKEND_URL}/payment/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

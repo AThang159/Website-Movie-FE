@@ -1,9 +1,9 @@
 import { SeatStatus } from "@/types/seat-status"
-import { API_BASE_URL } from "./config"
+import { API_BACKEND_URL } from "./config"
 import { ApiResponse } from "@/types/api-response"
 
 export async function fetchSeatStatusesByShowtime(showtimeId: string): Promise<SeatStatus[]> {
-  const res = await fetch(`${API_BASE_URL}/seat-statuses/showtime/${showtimeId}`)
+  const res = await fetch(`${API_BACKEND_URL}/seat-statuses/showtime/${showtimeId}`)
   if (!res.ok) throw new Error("Failed to fetch seat statuses")
 
   const json: ApiResponse<SeatStatus[]> = await res.json()

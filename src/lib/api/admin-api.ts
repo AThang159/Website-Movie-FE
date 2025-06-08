@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 
 export async function fetchOverview() {
-    const res = await fetch(`${API_BASE_URL}/admin/overview`, {
+    const res = await fetch(`${API_BACKEND_URL}/admin/overview`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"

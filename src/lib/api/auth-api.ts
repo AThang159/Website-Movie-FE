@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 
 type LoginPayload = {
   username: string;
@@ -6,7 +6,7 @@ type LoginPayload = {
 };
 
 export async function fetchLoginRequest({ username, password }: LoginPayload) {
-  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+  const res = await fetch(`${API_BACKEND_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

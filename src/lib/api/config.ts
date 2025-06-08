@@ -1,1 +1,2 @@
-export const API_BASE_URL = "http://localhost:8080/api";
+export const API_BACKEND_URL = process.env.NEXT_PUBLIC_API_BACKEND_URL;
+console.log("🧪 API_BACKEND_URL:", API_BACKEND_URL);

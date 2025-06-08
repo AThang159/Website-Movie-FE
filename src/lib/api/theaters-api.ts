@@ -1,5 +1,5 @@
 import { Theater } from "@/types/theater"; // Đảm bảo đã định nghĩa type này
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 
 interface ApiResponse<T> {
   success: boolean;
@@ -8,7 +8,7 @@ interface ApiResponse<T> {
 }
 
 export async function fetchTheaters(): Promise<Theater[]> {
-  const res = await fetch(`${API_BASE_URL}/theaters`);
+  const res = await fetch(`${API_BACKEND_URL}/theaters`);
   if (!res.ok) throw new Error("Failed to fetch theaters for the selected chain");
 
   const json: ApiResponse<Theater[]> = await res.json();
@@ -20,13 +20,13 @@ export async function fetchTheaters(): Promise<Theater[]> {
 }
 
 export async function getTheaterName(theaterId: number): Promise<string> {
-  const res = await fetch(`${API_BASE_URL}/theaters/${theaterId}/name`);
+  const res = await fetch(`${API_BACKEND_URL}/theaters/${theaterId}/name`);
   if (!res.ok) throw new Error("Failed to fetch theater name");
   return res.text();
 }
 
 export async function fetchTheatersByCityId(cityId: number): Promise<Theater[]> {
-  const res = await fetch(`${API_BASE_URL}/theaters?cityId=${cityId}`);
+  const res = await fetch(`${API_BACKEND_URL}/theaters?cityId=${cityId}`);
   if (!res.ok) throw new Error("Failed to fetch theaters by city");
 
   const json: ApiResponse<Theater[]> = await res.json();
@@ -38,7 +38,7 @@ export async function fetchTheatersByCityId(cityId: number): Promise<Theater[]> 
 }
 
 export async function addTheater(): Promise<any> {
-  const res = await fetch(`${API_BASE_URL}/theaters`, {
+  const res = await fetch(`${API_BACKEND_URL}/theaters`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),

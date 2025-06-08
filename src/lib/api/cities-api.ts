@@ -1,9 +1,9 @@
 import { City } from "@/types/city";
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 import { ApiResponse } from "@/types/api-response";
 
 export async function fetchCities(): Promise<City[]> {
-  const res = await fetch(`${API_BASE_URL}/cities`);
+  const res = await fetch(`${API_BACKEND_URL}/cities`);
   if (!res.ok) throw new Error("Failed to fetch cities");
 
   const json: ApiResponse<City[]> = await res.json();

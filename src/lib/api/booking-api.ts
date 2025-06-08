@@ -1,11 +1,11 @@
 import { Booking } from "@/types/booking";
 import { BookingDetail } from "@/types/booking-detail";
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 import { ApiResponse } from "@/types/api-response";
 
 
 export async function fetchBooking(bookingCode: string): Promise<BookingDetail> {
-  const res = await fetch(`${API_BASE_URL}/bookings/${bookingCode}`);
+  const res = await fetch(`${API_BACKEND_URL}/bookings/${bookingCode}`);
   if (!res.ok) throw new Error("Failed to fetch booking");
 
   const json: ApiResponse<BookingDetail> = await res.json();
@@ -20,7 +20,7 @@ export async function fetchBooking(bookingCode: string): Promise<BookingDetail> 
 }
 
 export async function fetchBookings(): Promise<Booking[]> {
-  const res = await fetch(`${API_BASE_URL}/bookings`);
+  const res = await fetch(`${API_BACKEND_URL}/bookings`);
   if (!res.ok) throw new Error("Failed to fetch bookings");
 
   const json: ApiResponse<Booking[]> = await res.json();

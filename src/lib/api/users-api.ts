@@ -1,10 +1,10 @@
 import { User } from "@/types/user";
-import { API_BASE_URL } from "./config";
+import { API_BACKEND_URL } from "./config";
 import { ApiResponse } from "@/types/api-response";
 
 
 export async function fetchUsers(): Promise<User[]> {
-  const res = await fetch(`${API_BASE_URL}/users`);
+  const res = await fetch(`${API_BACKEND_URL}/users`);
   if (!res.ok) {
     throw new Error(`Network error: ${res.status} ${res.statusText}`);
   }
