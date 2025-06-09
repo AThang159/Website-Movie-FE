@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Lock, Mail, AlertCircle, Phone, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { LoginPayload } from "@/types/login-pay-load"
-import { fetchLoginRequest } from "@/lib/api/auth-api"
+import { fetchLoginRequest } from "@/lib/api/backend/auth-api"
 
 export default function UserLogin() {
   const [isLogin, setIsLogin] = useState(true) // true = login, false = register

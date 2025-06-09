@@ -11,17 +11,8 @@ import {
 } from "@/components/ui/carousel";
 import { useMoviesHome } from "@/hooks/useMoviesHome";
 import { MovieCard } from "@/components/movie-card";
+import { MovieResponse } from "@/types/movie-response";
 
-interface Movie {
-  movieId: string;
-  title: string;
-  englishTitle?: string;
-  posterUrl: string;
-  releaseDate: string;
-  rating?: number;
-  featured?: boolean;
-  isComingSoon?: boolean;
-}
 
 interface MovieCarouselProps {
   title: string;
@@ -31,7 +22,7 @@ interface MovieCarouselProps {
 export function MovieCarousel({ title, viewAllLink}: MovieCarouselProps) {
   const { nowShowingMovies, comingSoonMovies, loading } = useMoviesHome();
 
-  let movies: Movie[] = [];
+  let movies: MovieResponse[] = [];
 
   if(viewAllLink == "/dang-chieu") {
     movies = nowShowingMovies;
@@ -62,18 +53,18 @@ export function MovieCarousel({ title, viewAllLink}: MovieCarouselProps) {
         <CarouselContent className="-ml-4">
           {movies.map((movie) => (
             <CarouselItem
-              key={movie.movieId}
+              key={movie.movieCode}
               className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
             >
               <MovieCard
-                id={movie.movieId}
+                id={movie.movieCode}
                 title={movie.title}
                 englishTitle={movie.englishTitle}
                 posterUrl={movie.posterUrl}
                 releaseDate={movie.releaseDate}
                 rating={movie.rating}
                 featured={movie.featured}
-                isComingSoon={movie.isComingSoon}
+                isComingSoon={movie.status === "COMING_SOON"}
               />
             </CarouselItem>
           ))}

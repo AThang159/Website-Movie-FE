@@ -1,6 +1,0 @@
-import { Theater } from "./theater";
-
-export interface Chain {
-  id: number,
-  name: string;
-}

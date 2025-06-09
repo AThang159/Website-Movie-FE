@@ -2,21 +2,21 @@
 
 import { useEffect, useState } from "react"
 import { Clock, Star } from "lucide-react"
-import { Movie } from "@/types/movie"
-import { fetchMovie } from "@/lib/api/movies-api"
+import { MovieResponse } from "@/types/movie-response"
+import { fetchMovie } from "@/lib/api/backend/movie-api"
 
 interface MovieDetailsProps {
-  movieId: string
+  movieCode: string
 }
 
-export default function MovieDetails({ movieId }: MovieDetailsProps) {
-  const [movie, setMovie] = useState<Movie | null>(null)
+export default function MovieDetails({ movieCode }: MovieDetailsProps) {
+  const [movie, setMovie] = useState<MovieResponse | null>(null)
   const [error, setError] = useState<string>("")
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const movieData = await fetchMovie(movieId)
+        const movieData = await fetchMovie(movieCode)
         setMovie(movieData)
       } catch (error) {
         console.error("Failed to fetch movie", error)
@@ -24,8 +24,8 @@ export default function MovieDetails({ movieId }: MovieDetailsProps) {
       }
     }
 
-    if (movieId) fetchData()
-  }, [movieId])
+    if (movieCode) fetchData()
+  }, [movieCode])
 
   if (error) return <p className="text-red-500">{error}</p>
   if (!movie) return <p>Đang tải phim...</p>

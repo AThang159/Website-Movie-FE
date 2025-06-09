@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -12,35 +12,62 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Search, MapPin, CircleHelp, User } from "lucide-react";
+import { getUserProfile, logoutUser } from "@/lib/api/backend/user/user-api";
+import { UserResponse } from "@/types/user-response";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<UserResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setIsLoading(true);
+        const userData = await getUserProfile();
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogout = () => {
+    const logout = async () => {
+      try {
+        await logoutUser();
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Failed to logout:", error);
+      }
+    };
+    logout();
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
-      <div className="container mx-auto max-w-7xl px-4 py-3">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="container mx-auto max-w-7xl px-2 py-2">
+        <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex-shrink-0">
             <Image
               src="/images/logo.png"
               alt="Moveek"
-              width={120}
-              height={24}
+              width={100}
+              height={20}
             />
           </Link>
 
           {/* Main Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6 text-sm">
-            <Link
-              href="/mua-ve"
-              className="text-moveek-darkgray hover:text-moveek-red"
-            >
-              Đặt vé phim chiếu rạp
-            </Link>
+          <nav className="hidden lg:flex items-center space-x-4 text-sm">
             <Link
               href="/lich-chieu"
-              className="text-moveek-darkgray hover:text-moveek-red"
+              className="text-moveek-darkgray hover:text-moveek-red whitespace-nowrap"
             >
               Lịch chiếu
             </Link>
@@ -50,7 +77,7 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="link"
-                  className="text-moveek-darkgray p-0 hover:text-moveek-red"
+                  className="text-moveek-darkgray p-0 hover:text-moveek-red h-auto"
                 >
                   Phim <span className="ml-1">▼</span>
                 </Button>
@@ -87,7 +114,7 @@ export function Header() {
             {/* Rạp Link */}
             <Link
               href="/rap"
-              className="text-moveek-darkgray hover:text-moveek-red"
+              className="text-moveek-darkgray hover:text-moveek-red whitespace-nowrap"
             >
               Rạp
             </Link>
@@ -97,7 +124,7 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="link"
-                  className="text-moveek-darkgray p-0 hover:text-moveek-red"
+                  className="text-moveek-darkgray p-0 hover:text-moveek-red h-auto"
                 >
                   Tin tức <span className="ml-1">▼</span>
                 </Button>
@@ -123,47 +150,76 @@ export function Header() {
 
             <Link
               href="/community"
-              className="text-moveek-darkgray hover:text-moveek-red"
+              className="text-moveek-darkgray hover:text-moveek-red whitespace-nowrap"
             >
               Cộng đồng
             </Link>
           </nav>
 
           {/* Search Bar */}
-          <div className="hidden md:flex relative md:min-w-64 lg:min-w-80">
+          <div className="hidden md:flex relative flex-1 max-w-xs mx-4">
             <Input
               type="text"
               placeholder="Tìm phim, diễn viên, rạp..."
-              className="pl-10 pr-4 py-2 w-full rounded-full border-gray-300"
+              className="pl-8 pr-4 py-1 w-full rounded-full border-gray-300 text-sm"
             />
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
             />
           </div>
 
           {/* Right Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button className="flex items-center text-sm text-moveek-darkgray hover:text-moveek-red">
-              <MapPin className="h-4 w-4 mr-1" />
+          <div className="hidden md:flex items-center space-x-2">
+            <button className="p-1.5 text-moveek-darkgray hover:text-moveek-red">
+              <MapPin className="h-4 w-4" />
             </button>
             <Link
               href="/support"
-              className="flex items-center text-sm text-moveek-darkgray hover:text-moveek-red"
+              className="p-1.5 text-moveek-darkgray hover:text-moveek-red"
             >
-              <CircleHelp className="h-4 w-4 mr-1" />
-              Hỗ trợ
+              <CircleHelp className="h-4 w-4" />
             </Link>
-            <Link
-              href="/login"
-              className="flex items-center text-sm text-moveek-darkgray hover:text-moveek-red"
-            >
-              <User className="h-4 w-4 mr-1" />
-            </Link>
+            {!isLoading && (
+              user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="p-1.5 h-auto hover:bg-transparent">
+                      <div className="flex items-center text-sm text-moveek-darkgray">
+                        <User className="h-4 w-4" />
+                        <span className="ml-1.5 max-w-[70px] truncate">{user.lastName || "Tài khoản"}</span>
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48">
+                    <DropdownMenuItem>
+                      <Link href="/profile" className="w-full">
+                        Thông tin tài khoản
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Link href="/lich-su-dat-ve" className="w-full">
+                        Lịch sử đặt vé
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Đăng xuất
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  href="/login"
+                  className="p-1.5 text-moveek-darkgray hover:text-moveek-red"
+                >
+                  <User className="h-4 w-4" />
+                </Link>
+              )
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden"
+            className="lg:hidden p-1"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <svg
@@ -185,21 +241,15 @@ export function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="mt-4 lg:hidden">
-            <nav className="flex flex-col space-y-3 pb-3">
-              <Link
-                href="/mua-ve"
-                className="text-moveek-darkgray hover:text-moveek-red"
-              >
-                Đặt vé phim chiếu rạp
-              </Link>
+          <div className="mt-2 lg:hidden">
+            <nav className="flex flex-col space-y-2 pb-2">
               <Link
                 href="/lich-chieu"
                 className="text-moveek-darkgray hover:text-moveek-red"
               >
                 Lịch chiếu
               </Link>
-              <div className="flex flex-col space-y-2 ml-3">
+              <div className="flex flex-col space-y-1 ml-3">
                 <Link
                   href="/dang-chieu"
                   className="text-moveek-darkgray hover:text-moveek-red"
@@ -225,7 +275,7 @@ export function Header() {
               >
                 Rạp
               </Link>
-              <div className="flex flex-col space-y-2 ml-3">
+              <div className="flex flex-col space-y-1 ml-3">
                 <Link
                   href="/tin-tuc"
                   className="text-moveek-darkgray hover:text-moveek-red"
@@ -246,7 +296,7 @@ export function Header() {
                 Cộng đồng
               </Link>
             </nav>
-            <div className="flex items-center justify-between pt-3 border-t">
+            <div className="flex items-center justify-between pt-2 border-t">
               <Link
                 href="/support"
                 className="flex items-center text-sm text-moveek-darkgray hover:text-moveek-red"
@@ -254,13 +304,43 @@ export function Header() {
                 <CircleHelp className="h-4 w-4 mr-1" />
                 Hỗ trợ
               </Link>
-              <Link
-                href="/login"
-                className="flex items-center text-sm text-moveek-darkgray hover:text-moveek-red"
-              >
-                <User className="h-4 w-4 mr-1" />
-                Đăng nhập
-              </Link>
+              {!isLoading && (
+                user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="p-1 h-auto hover:bg-transparent">
+                        <div className="flex items-center text-sm text-moveek-darkgray">
+                          <User className="h-4 w-4" />
+                          <span className="ml-1 max-w-[60px] truncate">{user.lastName || "Tài khoản"}</span>
+                        </div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-48">
+                      <DropdownMenuItem>
+                        <Link href="/profile" className="w-full">
+                          Thông tin tài khoản
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Link href="/lich-su-dat-ve" className="w-full">
+                          Lịch sử đặt vé
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>
+                        Đăng xuất
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center text-sm text-moveek-darkgray hover:text-moveek-red"
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="ml-1 max-w-[60px] truncate">{"Đăng nhập"}</span>
+                  </Link>
+                )
+              )}
             </div>
           </div>
         )}

@@ -16,6 +16,12 @@ export function middleware(request: NextRequest) {
 
     const token = request.cookies.get('token')?.value
 
+  if (pathname === '/login') {
+    if (token) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+    return NextResponse.next()
+  }
 
   if (pathname === '/admin/login') {
     if (token){
@@ -28,7 +34,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  if (pathname.startsWith('/admin/overview')) {
+  if (pathname.startsWith('/admin/dashboard')) {
     if (!token) {
       // return null;
       return NextResponse.redirect(new URL('/unauthorized', request.url))
@@ -46,5 +52,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/login', '/admin/login'],
 }
+

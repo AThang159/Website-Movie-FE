@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Edit, Trash2, Mail, Phone, Calendar } from "lucide-react"
-import { fetchUsers } from "@/lib/api/users-api"
-import { User } from "@/types/user"
+import { fetchUsers } from "@/lib/api/backend/admin/users-api"
+import { UserResponse } from "@/types/user-response"
 
 export function UserManagement() {
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<UserResponse[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

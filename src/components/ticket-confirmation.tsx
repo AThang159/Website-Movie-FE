@@ -7,13 +7,13 @@ import Barcode from 'react-barcode';
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 
-import { Seat } from "@/types/seat"
+import { SeatResponse } from "@/types/seat-response"
 
-import { fetchBooking } from "@/lib/api/booking-api"
-import { fetchShowtime} from "@/lib/api/showtimes-api"
+import { fetchBooking } from "@/lib/api/backend/booking-api"
+import { fetchShowtime} from "@/lib/api/backend/showtime-api"
 
-import { ShowtimeDetail } from "@/types/showtime-detail";
-import { BookingDetail } from "@/types/booking-detail";
+import { ShowtimeDetailResponse } from "@/types/showtime-detail-response";
+import { BookingDetailResponse } from "@/types/booking-detail-response";
 
 interface TicketConfirmationProps{
   bookingCode: string
@@ -21,9 +21,8 @@ interface TicketConfirmationProps{
 
 export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
 
-    const [booking, setBooking] = useState<BookingDetail>();
-    const [showtime, setShowtime] = useState<ShowtimeDetail>();
-    const [seats, setSeats] = useState<Seat[]>([]);
+    const [booking, setBooking] = useState<BookingDetailResponse>();
+    const [seats, setSeats] = useState<SeatResponse[]>([]);
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [serviceFee, setServiceFee] = useState<number>(0);
     const ticketRef = useRef<HTMLDivElement>(null)
@@ -32,6 +31,7 @@ export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
       const fetchBookingData = async () => {
         try {
           const response = await fetchBooking(bookingCode);
+          console.log(response);
           setBooking(response);
         } catch (error) {
           console.error(error);
@@ -41,27 +41,9 @@ export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
       fetchBookingData();
     }, []);
 
-    useEffect(() =>{
-          const fetchData = async () => {
-            if (!booking){
-              return;
-            }
-              try {
-                  const showtimeId = booking?.tickets[0].seatStatus.showtimeId
-                  const response = await fetchShowtime(showtimeId);
-                  console.log(response);
-                  setShowtime(response);
-              } catch (error){
-                  console.error("Failed to fetch showtime", error);
-                  setShowtime(undefined);
-              }
-          }
-          fetchData();
-      }, [booking]);
-
     useEffect(() => {
       if (!booking) return;
-        const seats = booking.tickets.map(ticket => ticket.seatStatus.seat);
+        const seats = booking.tickets.map(ticket => ticket.seat);
         setSeats(seats)
     }, [booking])
 
@@ -137,24 +119,24 @@ export function TicketConfirmation({ bookingCode }: TicketConfirmationProps) {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-medium">{showtime?.movie.title}</h3>
+              <h3 className="font-medium">{booking?.showtime?.movie.title}</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="text-gray-500">Rạp chiếu</div>
-                  <div>{showtime?.theater?.name}</div>
+                  <div>{booking?.showtime?.theater?.name}</div>
                 </div>
                 <div>
                   <div className="text-gray-500">Phòng chiếu</div>
-                  <div>{showtime?.room?.name}</div>
+                  <div>{booking?.showtime?.room?.name}</div>
                 </div>
                 <div>
                   <div className="text-gray-500">Suất chiếu</div>
-                  <div>{showtime?.startTime} {showtime?.showDate}</div>
+                  <div>{booking?.showtime?.startTime} {booking?.showtime?.showDate}</div>
                 </div>
                 <div>
                   <div className="text-gray-500">Ghế</div>
                   <div>
-                    {seats.map(seat => seat.seatCode).join(', ')}
+                    {booking?.tickets.map(ticket => ticket.seat.seatCode).join(', ')}
                   </div>
                 </div>
               </div>

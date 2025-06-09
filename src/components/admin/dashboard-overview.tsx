@@ -1,9 +1,9 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { fetchOverview } from "@/lib/api/admin-api"
-import { fetchShowtimesToday } from "@/lib/api/showtimes-api";
-import { Showtime } from "@/types/showtime";
+import { fetchOverview } from "@/lib/api/backend/admin/dashboard-api"
+import { fetchShowtimesToday } from "@/lib/api/backend/admin/showtime-api";
+import { ShowtimeResponse } from "@/types/showtime-response";
 import { Film, Building2, Users, Ticket, TrendingUp, Calendar } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -24,7 +24,7 @@ export interface Overview {
 
 export function DashboardOverview() {
   const [stats, setStats] = useState<StatItem[]>();
-  const [showtimes, setShowtimes] = useState<Showtime[]>([]);
+  const [showtimes, setShowtimes] = useState<ShowtimeResponse[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {

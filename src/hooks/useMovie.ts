@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { Movie } from "@/types/movie";
+import { MovieResponse } from "@/types/movie-response";
 
 export function useMovie(movieId: string) {
-  const [movie, setMovie] = useState<Movie | null>(null);
+  const [movie, setMovie] = useState<MovieResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {

@@ -18,7 +18,7 @@ export function AdminSidebar() {
   const pathname = usePathname()
 
   const menuItems = [
-    { id: "overview", label: "Tổng quan", icon: LayoutDashboard },
+    { id: "dashboard", label: "Tổng quan", icon: LayoutDashboard },
     { id: "movies", label: "Quản lý phim", icon: Film },
     { id: "theaters", label: "Quản lý rạp", icon: Building2 },
     { id: "showtimes", label: "Suất chiếu", icon: Calendar },

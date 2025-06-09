@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Movie } from "@/types/movie";
-import { getNowShowingMovies, getComingSoonMovies } from "@/lib/api/movies-api";
+import { MovieResponse } from "@/types/movie-response";
+import { getNowShowingMovies, getComingSoonMovies } from "@/lib/api/backend/movie-api";
 
 export function useMoviesHome() {
-  const [nowShowingMovies, setNowShowingMovies] = useState<Movie[]>([]);
-  const [comingSoonMovies, setComingSoonMovies] = useState<Movie[]>([]);
+  const [nowShowingMovies, setNowShowingMovies] = useState<MovieResponse[]>([]);
+  const [comingSoonMovies, setComingSoonMovies] = useState<MovieResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

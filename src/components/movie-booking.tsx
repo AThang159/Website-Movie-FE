@@ -1,66 +1,34 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { fetchShowtime } from "@/lib/api/showtimes-api"
-import { SeatStatus } from "@/types/seat-status"
+import { fetchShowtime } from "@/lib/api/backend/showtime-api"
 import { SeatSelection } from "./seat-selection";
 import { PaymentForm } from "./payment-form";
-import { ShowtimeDetail } from "@/types/showtime-detail"
-import { fetchSeatStatusesByShowtime } from "@/lib/api/seat-statuses-api";
-
+import { ShowtimeDetailResponse } from "@/types/showtime-detail-response"
 
 interface MovieBookingProps {
   showtimeId: string
 }
 
 export default function MovieBooking({ showtimeId }: MovieBookingProps) {
-
   const [currentStep, setCurrentStep] = useState(1);
-
-  const [showtime, setShowtime] = useState<ShowtimeDetail>();
-  const [seatStatuses, setSeatStatuses] = useState<SeatStatus[]>([]);
-  const [unavailableSeats, setUnavailableSeats] = useState<number[]>([]);
+  const [showtime, setShowtime] = useState<ShowtimeDetailResponse>();
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
-  const [vipSeats, setVipSeats] = useState<number[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
-
-  useEffect(() =>{
-      const fetchData = async () => {
-          try {
-              const response = await fetchShowtime(showtimeId);
-              console.log(response);
-              setShowtime(response);
-          } catch (error){
-              console.error("Failed to fetch showtime", error);
-              setShowtime(undefined);
-          }
-      }
-      fetchData();
-  }, []);
-
   useEffect(() => {
-      if (!showtime) return
-
-      const fetchData = async () => {
-          try {
-              const seatStatuses = await fetchSeatStatusesByShowtime(showtimeId)
-              const vipSeats = seatStatuses
-              .filter((s) => s.seat.type === "VIP")
-              .map((s) => s.seat.id)
-              setVipSeats(vipSeats) 
-              const bookedSeats = seatStatuses
-              .filter((s) => s.ticketId !== null)
-              .map((s) => s.id)
-              setUnavailableSeats(bookedSeats)
-              setSeatStatuses(seatStatuses)
-          } catch (error) {
-              console.error("Failed to fetch seat statuses", error)
-              setUnavailableSeats([])
-          }
+    const fetchData = async () => {
+      try {
+        const response = await fetchShowtime(showtimeId);
+        // console.log(response);
+        setShowtime(response);
+      } catch (error) {
+        console.error("Failed to fetch showtime", error);
+        setShowtime(undefined);
       }
-      fetchData()
-  }, [showtime])
+    }
+    fetchData();
+  }, []);
 
   const handleSelectionChange = (seats: number[], price: number) => {
     setSelectedSeats(seats);
@@ -70,22 +38,19 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return(
+        return (
           <SeatSelection 
             showtimeData={showtime} 
-            seatStatusesData={seatStatuses}
-            unavailableSeatsData={unavailableSeats}
             selectedSeatsData={selectedSeats}
-            vipSeatsData={vipSeats}
             onSelectionChange={handleSelectionChange}            
-            goToStep={setCurrentStep} />
+            goToStep={setCurrentStep} 
+          />
         )
       case 2: 
         return (
           <div>
             <PaymentForm 
               showtimeData={showtime} 
-              seatStatusesData={seatStatuses}
               selectedSeatsData={selectedSeats}
               totalPriceData={totalPrice}
               goToStep={setCurrentStep}
@@ -124,9 +89,9 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
           </div>
         </div>
       </div>
-        <div className="max-w-7xl mx-auto px-4 py-8">
-            {renderCurrentStep()}
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {renderCurrentStep()}
+      </div>
     </div>
   )
 }

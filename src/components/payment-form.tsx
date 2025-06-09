@@ -7,13 +7,11 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CreditCard, Smartphone, Building2 } from "lucide-react"
-import { SeatStatus } from "@/types/seat-status"
-import { ShowtimeDetail } from "@/types/showtime-detail"
-import { createPayment } from "@/lib/api/payment-api"
+import { ShowtimeDetailResponse } from "@/types/showtime-detail-response"
+import { createPayment } from "@/lib/api/backend/payment-api"
 
 interface PaymentFormProps {
-    showtimeData?: ShowtimeDetail
-    seatStatusesData?: SeatStatus[]
+    showtimeData?: ShowtimeDetailResponse
     selectedSeatsData?: number[]
     totalPriceData?: number
     onSelectionChange?: (selectedSeats: number[], totalPrice: number) => void
@@ -22,15 +20,13 @@ interface PaymentFormProps {
 
 export function PaymentForm({ 
     showtimeData, 
-    seatStatusesData,
     selectedSeatsData,
     totalPriceData,
     onSelectionChange,
     goToStep
- }: PaymentFormProps) {
+}: PaymentFormProps) {
 
-    const [showtime, setShowtime] = useState<ShowtimeDetail>();
-    const [seatStatuses, setSeatStatuses] = useState<SeatStatus[]>([]);
+    const [showtime, setShowtime] = useState<ShowtimeDetailResponse>();
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [serviceFee, setServiceFee] = useState<number>(0);
@@ -46,10 +42,6 @@ export function PaymentForm({
     useEffect(() => {
         if (showtimeData) setShowtime(showtimeData);
     }, [showtimeData]);
-
-    useEffect(() => {
-        if (seatStatusesData) setSeatStatuses(seatStatusesData);
-    }, [seatStatusesData]);
 
     useEffect(() => {
         if (selectedSeatsData) setSelectedSeats(selectedSeatsData);
@@ -72,6 +64,11 @@ export function PaymentForm({
         return
       }
 
+      if (!showtime?.id) {
+        alert("Không tìm thấy thông tin suất chiếu")
+        return
+      }
+
       // if (!customerFirstName || !customerLastName || !customerPhone || !customerEmail) {
       //   alert("Vui lòng điền đầy đủ thông tin khách hàng.")
       //   return
@@ -82,17 +79,18 @@ export function PaymentForm({
 
       try {
         const amount = totalPrice + serviceFee;
+        const customerFullName = `${customerFirstName} ${customerLastName}`.trim();
 
         const data = await createPayment({
-          amount,
-          customerFirstName,
-          customerLastName,
           customerPhone,
+          customerFullName,
           customerEmail,
-          selectedSeatIds: selectedSeats,
+          seatSelectedIds: selectedSeats,
           totalPrice,
           serviceFee,
-          paymentMethod
+          amount,
+          paymentMethod,
+          showtimeId: showtime.id
         });
 
         if (!data.url) {
@@ -179,20 +177,41 @@ export function PaymentForm({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="first-name">Họ</Label>
-                <Input id="first-name" placeholder="Nguyễn" />
+                <Input 
+                  id="first-name" 
+                  placeholder="Nguyễn" 
+                  value={customerFirstName}
+                  onChange={(e) => setCustomerFirstName(e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="last-name">Tên</Label>
-                <Input id="last-name" placeholder="Văn A" />
+                <Input 
+                  id="last-name" 
+                  placeholder="Văn A" 
+                  value={customerLastName}
+                  onChange={(e) => setCustomerLastName(e.target.value)}
+                />
               </div>
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="example@email.com" />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="example@email.com" 
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="phone">Số điện thoại</Label>
-              <Input id="phone" placeholder="0123 456 789" />
+              <Input 
+                id="phone" 
+                placeholder="0123 456 789" 
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+              />
             </div>
           </CardContent>
         </Card>
@@ -247,9 +266,9 @@ export function PaymentForm({
                 <span>Ghế:</span>
                 <span>
                     {selectedSeats
-                        .map(id => seatStatuses.find(seat => seat.id === id)?.seat.seatCode)
-                        .filter(Boolean)
-                        .join(", ") || "..."}
+                      .map(id => showtime?.room?.seats.find(seat => seat.id === id)?.seatCode)
+                      .filter(Boolean)
+                      .join(", ") || "..."}
                 </span>
               </div>
             </div>
@@ -281,10 +300,10 @@ export function PaymentForm({
               </button>
               <button
                 className="px-8 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:opacity-50"
-                disabled={!agreeTerms}
+                disabled={!agreeTerms || loading}
                 onClick={handleContinue}
               >
-                Thanh toán
+                {loading ? "Đang xử lý..." : "Thanh toán"}
               </button>
             </div>
           </CardContent>

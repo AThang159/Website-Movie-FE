@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Eye, Download, Calendar, Clock } from "lucide-react"
-import { Booking } from "@/types/booking"
-import { fetchBookings } from "@/lib/api/booking-api"
+import { BookingResponse } from "@/types/booking-response"
+import { fetchBookings } from "@/lib/api/backend/admin/booking-api"
 
 export function BookingManagement() {
-  const [bookings, setBookings] = useState<Booking[]>([])
+  const [bookings, setBookings] = useState<BookingResponse[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -109,22 +109,22 @@ export function BookingManagement() {
                       </div>
                     </td>
                     <td className="p-3 font-medium">{booking.customerFullName}</td>
-                    <td className="p-3">{booking.showtime.movie.title}</td>
+                    <td className="p-3">{booking.showtime?.movie.title}</td>
                     <td className="p-3">
                       <div>
-                        <p className="text-sm">{booking.showtime.theater?.name}</p>
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{booking.showtime.room?.name}</span>
+                        <p className="text-sm">{booking.showtime?.theater?.name}</p>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{booking.showtime?.room?.name}</span>
                       </div>
                     </td>
                     <td className="p-3">
                       <div className="text-sm">
                         <div className="flex items-center">
                           <Calendar className="w-3 h-3 mr-1 text-gray-400" />
-                          {booking.showtime.showDate} 
+                          {booking.showtime?.showDate} 
                         </div>
                         <div className="flex items-center">
                           <Clock className="w-3 h-3 mr-1 text-gray-400" />
-                          {booking.showtime.startTime}
+                          {booking.showtime?.startTime}
                         </div>
                       </div>
                     </td>

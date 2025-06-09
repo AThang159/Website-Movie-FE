@@ -4,21 +4,20 @@ import { useState, useEffect, useMemo } from "react"
 import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 
-import { fetchCities } from "@/lib/api/cities-api"
-import { fetchMovieFormats } from "@/lib/api/movie-formats-api"
-import { fetchTheatersByCityId } from "@/lib/api/theaters-api"
-import { fetchShowtimesByMovieAndDateAndTheaterId } from "@/lib/api/showtimes-api"
+import { fetchCities } from "@/lib/api/backend/city-api"
+import { fetchTheatersByCityId } from "@/lib/api/backend/theater-api"
+import { fetchShowtimesByMovieAndDateAndTheaterId } from "@/lib/api/backend/showtime-api"
 
-import { Showtime } from "@/types/showtime"
-import { Theater } from "@/types/theater"
+import { ShowtimeResponse } from "@/types/showtime-response"
+import { TheaterResponse } from "@/types/theater-response"
 import { Format } from "@/types/format"
 import { City } from "@/types/city"
 
 interface MovieProps {
-  movieId: string
+  movieCode: string
 }
 
-export default function ShowtimesSelector({ movieId }: MovieProps) {
+export default function ShowtimesSelector({ movieCode }: MovieProps) {
   const dateOptions = useMemo(() => {
     const dates = []
     const today = new Date()
@@ -38,15 +37,13 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
   }, [])
 
   const [selectedCityId, setSelectedCityId] = useState<number>(1)
-  const [selectedFormatId, setSelectedFormatId] = useState<number>(0)
   const [selectedDateIndex, setSelectedDateIndex] = useState(0)
   const [selectedTheaterId, setSelectedTheaterId] = useState<number>(0)
   const [expandedTheaterId, setExpandedTheaterId] = useState<number | null>(null)
 
   const [cities, setCities] = useState<City[]>([])
-  const [movieFormats, setMovieFormats] = useState<Format[]>([])
-  const [theaters, setTheaters] = useState<Theater[]>([])
-  const [showtimes, setShowtimes] = useState<Showtime[]>([])
+  const [theaters, setTheaters] = useState<TheaterResponse[]>([])
+  const [showtimes, setShowtimes] = useState<ShowtimeResponse[]>([])
 
   // Load cities + formats
   useEffect(() => {
@@ -54,9 +51,6 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
       try {
         const citiesData = await fetchCities()
         setCities(citiesData)
-
-        const formatsData = await fetchMovieFormats()
-        setMovieFormats(formatsData)
       } catch (error) {
         console.error("Failed to fetch cities or formats", error)
       }
@@ -94,7 +88,7 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
 
       try {
         const showtimesData = await fetchShowtimesByMovieAndDateAndTheaterId(
-          movieId,
+          movieCode,
           date,
           selectedTheaterId
         )
@@ -105,13 +99,7 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
       }
     }
     fetchShowtimes()
-  }, [selectedTheaterId, selectedDateIndex, movieId, dateOptions])
-
-  // Lọc showtimes theo định dạng nếu chọn
-  const filteredShowtimes = useMemo(() => {
-    if (selectedFormatId === 0) return showtimes
-    return showtimes.filter((st) => st.format.id === selectedFormatId)
-  }, [showtimes, selectedFormatId])
+  }, [selectedTheaterId, selectedDateIndex, movieCode, dateOptions])
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -130,22 +118,6 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
               {cities.map((city) => (
                 <option key={city.id} value={city.id}>
                   {city.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 pointer-events-none" />
-          </div>
-
-          <div className="relative">
-            <select
-              className="w-full border rounded px-4 py-2.5 appearance-none focus:outline-none focus:ring-1 focus:ring-red-500"
-              value={selectedFormatId}
-              onChange={(e) => setSelectedFormatId(Number(e.target.value))}
-            >
-              <option value={0}>Định dạng</option>
-              {movieFormats.map((format) => (
-                <option key={format.id} value={format.id}>
-                  {format.name}
                 </option>
               ))}
             </select>
@@ -189,9 +161,9 @@ export default function ShowtimesSelector({ movieId }: MovieProps) {
 
                 {expandedTheaterId === theater.id && (
                   <div className="p-4">
-                    {filteredShowtimes.length > 0 ? (
+                    {showtimes.length > 0 ? (
                       <div className="flex flex-wrap gap-3">
-                        {filteredShowtimes
+                        {showtimes
                           .sort((a, b) => (a.startTime ?? "").localeCompare(b.startTime ?? ""))
                           .map((showtime) => (
                             <Link

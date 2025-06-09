@@ -1,4 +1,5 @@
-export interface Format {
-  id: number;
-  name: string;
+export enum Format {
+  TwoD = "2D",
+  ThreeD = "3D",
+  IMAX = "IMAX"
 }
