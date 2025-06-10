@@ -5,6 +5,8 @@ import { fetchShowtime } from "@/lib/api/backend/showtime-api"
 import { SeatSelection } from "./seat-selection";
 import { PaymentForm } from "./payment-form";
 import { ShowtimeDetailResponse } from "@/types/showtime-detail-response"
+import { UserResponse } from "@/types/user-response"
+import { getUserProfile } from "@/lib/api/backend/user/user-api"
 
 interface MovieBookingProps {
   showtimeId: string
@@ -15,19 +17,31 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
   const [showtime, setShowtime] = useState<ShowtimeDetailResponse>();
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [user, setUser] = useState<UserResponse | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchShowtimeData = async () => {
       try {
-        const response = await fetchShowtime(showtimeId);
-        // console.log(response);
-        setShowtime(response);
+        const showtimeResponse = await fetchShowtime(showtimeId);
+        setShowtime(showtimeResponse);
       } catch (error) {
         console.error("Failed to fetch showtime", error);
         setShowtime(undefined);
       }
-    }
-    fetchData();
+    };
+  
+    const fetchUserData = async () => {
+      try {
+        const userResponse = await getUserProfile();
+        setUser(userResponse);
+      } catch (error) {
+        console.warn("User not logged in or failed to fetch user", error);
+        setUser(null);
+      }
+    };
+  
+    fetchShowtimeData();
+    fetchUserData();
   }, []);
 
   const handleSelectionChange = (seats: number[], price: number) => {
@@ -54,6 +68,7 @@ export default function MovieBooking({ showtimeId }: MovieBookingProps) {
               selectedSeatsData={selectedSeats}
               totalPriceData={totalPrice}
               goToStep={setCurrentStep}
+              user={user || undefined}
             />
           </div>
         )

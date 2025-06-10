@@ -192,13 +192,8 @@ export function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-48">
                     <DropdownMenuItem>
-                      <Link href="/profile" className="w-full">
+                      <Link href="/user/profile" className="w-full">
                         Thông tin tài khoản
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/lich-su-dat-ve" className="w-full">
-                        Lịch sử đặt vé
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>

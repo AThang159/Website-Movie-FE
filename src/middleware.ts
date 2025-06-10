@@ -16,6 +16,14 @@ export function middleware(request: NextRequest) {
 
     const token = request.cookies.get('token')?.value
 
+  if (pathname.startsWith('/user')) {
+    if (!token) {
+      console.log('token not found')
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    return NextResponse.next()
+  }
+
   if (pathname === '/login') {
     if (token) {
       return NextResponse.redirect(new URL('/', request.url))
@@ -52,6 +60,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login', '/admin/login'],
+  matcher: ['/admin/:path*', '/login', '/admin/login', '/user/:path*'],
 }
 

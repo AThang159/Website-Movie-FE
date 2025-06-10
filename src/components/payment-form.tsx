@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { CreditCard, Smartphone, Building2 } from "lucide-react"
 import { ShowtimeDetailResponse } from "@/types/showtime-detail-response"
 import { createPayment } from "@/lib/api/backend/payment-api"
+import { UserResponse } from "@/types/user-response"
 
 interface PaymentFormProps {
     showtimeData?: ShowtimeDetailResponse
@@ -16,6 +17,7 @@ interface PaymentFormProps {
     totalPriceData?: number
     onSelectionChange?: (selectedSeats: number[], totalPrice: number) => void
     goToStep: (step: number) => void;
+    user?: UserResponse;
 }
 
 export function PaymentForm({ 
@@ -23,7 +25,8 @@ export function PaymentForm({
     selectedSeatsData,
     totalPriceData,
     onSelectionChange,
-    goToStep
+    goToStep,
+    user
 }: PaymentFormProps) {
 
     const [showtime, setShowtime] = useState<ShowtimeDetailResponse>();
@@ -55,6 +58,15 @@ export function PaymentForm({
         setServiceFee(selectedSeats.length * 5000);
     }, [selectedSeats])
 
+    useEffect(() => {
+        if (user) {
+            setCustomerFirstName(user.firstName);
+            setCustomerLastName(user.lastName);
+            setCustomerEmail(user.email);
+            setCustomerPhone(user.phone);
+        }
+    }, [user]);
+
     const [paymentMethod, setPaymentMethod] = useState("credit-card")
     const [agreeTerms, setAgreeTerms] = useState(false)
 
@@ -69,11 +81,6 @@ export function PaymentForm({
         return
       }
 
-      // if (!customerFirstName || !customerLastName || !customerPhone || !customerEmail) {
-      //   alert("Vui lòng điền đầy đủ thông tin khách hàng.")
-      //   return
-      // }
-
       setLoading(true)
       setError(null)
 
@@ -82,6 +89,7 @@ export function PaymentForm({
         const customerFullName = `${customerFirstName} ${customerLastName}`.trim();
 
         const data = await createPayment({
+          userId: user?.id?.toString() || "",
           customerPhone,
           customerFullName,
           customerEmail,
@@ -101,6 +109,7 @@ export function PaymentForm({
           onSelectionChange(selectedSeats, totalPrice);
         }
 
+        console.log(data)
         window.location.href = data.url;
       } catch (err: any) {
         setError(err.message || "Đã xảy ra lỗi khi tạo thanh toán");
